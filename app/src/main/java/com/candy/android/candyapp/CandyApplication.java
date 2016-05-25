@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.candy.android.candyapp.graph.component.ActivityComponent;
 import com.candy.android.candyapp.graph.component.DaggerActivityComponent;
+import com.candy.android.zlog.ZLog;
 import com.facebook.FacebookSdk;
 
 /**
@@ -17,7 +18,7 @@ public class CandyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
+        ZLog.init(BuildConfig.DEBUG);
         FacebookSdk.sdkInitialize(this);
 
         activityComponent = DaggerActivityComponent.builder()
@@ -26,5 +27,9 @@ public class CandyApplication extends Application {
 
     public ActivityComponent getActivityComponent() {
         return activityComponent;
+    }
+
+    public void setActivityComponent(ActivityComponent activityComponent) {
+        this.activityComponent = activityComponent;
     }
 }
