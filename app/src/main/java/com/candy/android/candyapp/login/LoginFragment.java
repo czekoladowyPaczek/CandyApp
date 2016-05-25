@@ -10,6 +10,7 @@ import android.widget.Button;
 
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
+import com.candy.android.zlog.ZLog;
 
 import javax.inject.Inject;
 
@@ -44,7 +45,6 @@ public class LoginFragment extends Fragment {
         ButterKnife.bind(this, root);
 
         loginPresenter.setParent(this);
-
         return root;
     }
 
