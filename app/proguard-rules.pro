@@ -19,3 +19,8 @@
 
 # Retrolambda https://github.com/evant/gradle-retrolambda
 -dontwarn java.lang.invoke.*
+
+-keep class com.facebook.** {
+   *;
+}
+-keepattributes Signature
