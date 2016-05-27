@@ -15,3 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+
+# Retrolambda https://github.com/evant/gradle-retrolambda
+-dontwarn java.lang.invoke.*

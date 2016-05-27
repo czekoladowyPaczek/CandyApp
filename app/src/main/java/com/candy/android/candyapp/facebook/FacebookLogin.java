@@ -1,12 +1,17 @@
 package com.candy.android.candyapp.facebook;
 
+import android.content.Intent;
+
 import com.candy.android.candyapp.login.LoginFragment;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 
 import java.util.Arrays;
+
+import rx.Observable;
 
 /**
  * @author Marcin
@@ -22,11 +27,39 @@ public class FacebookLogin {
         callbackManager = CallbackManager.Factory.create();
     }
 
-    public void setCallback(FacebookCallback<LoginResult> callback) {
-        loginManager.registerCallback(callbackManager, callback);
+    public Observable<String> loginWithEmailPermission(LoginFragment fragment) {
+        Observable<String> obs = Observable.create(subscriber -> {
+            loginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    if (!subscriber.isUnsubscribed()) {
+                        subscriber.onNext(loginResult.getAccessToken().getToken());
+                        subscriber.onCompleted();
+                    }
+                }
+
+                @Override
+                public void onCancel() {
+                    if (!subscriber.isUnsubscribed()) {
+                        subscriber.onNext("");
+                        subscriber.onCompleted();
+                    }
+                }
+
+                @Override
+                public void onError(FacebookException error) {
+                    if (!subscriber.isUnsubscribed()) {
+                        subscriber.onError(error);
+                    }
+                }
+            });
+        });
+
+        loginManager.logInWithReadPermissions(fragment, Arrays.asList(PERMISSIONS));
+        return obs;
     }
 
-    public void loginWithEmailPermission(LoginFragment fragment) {
-        loginManager.logInWithReadPermissions(fragment, Arrays.asList(PERMISSIONS));
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }

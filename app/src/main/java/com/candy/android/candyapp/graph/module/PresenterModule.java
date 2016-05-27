@@ -2,6 +2,7 @@ package com.candy.android.candyapp.graph.module;
 
 import com.candy.android.candyapp.facebook.FacebookLogin;
 import com.candy.android.candyapp.login.LoginPresenter;
+import com.candy.android.candyapp.managers.UserManager;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,7 +13,7 @@ import dagger.Provides;
 @Module
 public class PresenterModule {
     @Provides
-    public LoginPresenter provideLoginPresenter(FacebookLogin facebookLogin) {
-        return new LoginPresenter(facebookLogin);
+    public LoginPresenter provideLoginPresenter(FacebookLogin facebookLogin, UserManager manager) {
+        return new LoginPresenter(facebookLogin, manager);
     }
 }
