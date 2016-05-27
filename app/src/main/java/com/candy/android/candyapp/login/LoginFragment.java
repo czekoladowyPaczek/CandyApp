@@ -1,5 +1,6 @@
 package com.candy.android.candyapp.login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,7 +11,6 @@ import android.widget.Button;
 
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
-import com.candy.android.zlog.ZLog;
 
 import javax.inject.Inject;
 
@@ -45,6 +45,9 @@ public class LoginFragment extends Fragment {
         ButterKnife.bind(this, root);
 
         loginPresenter.setParent(this);
+
+        loginButton.setOnClickListener(v -> loginPresenter.startFacebookLogin());
+
         return root;
     }
 
@@ -52,5 +55,11 @@ public class LoginFragment extends Fragment {
     public void onDestroyView() {
         loginPresenter.removeParent();
         super.onDestroyView();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        loginPresenter.onActivityResult(requestCode, resultCode, data);
     }
 }
