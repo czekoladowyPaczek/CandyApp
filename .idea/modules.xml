@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/candyapp.iml" filepath="$PROJECT_DIR$/candyapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/zlog/zlog.iml" filepath="$PROJECT_DIR$/zlog/zlog.iml" />
+      <module fileurl="file://$PROJECT_DIR$/candyapp.iml" filepath="$PROJECT_DIR$/candyapp.iml" />
       <module fileurl="file://$PROJECT_DIR$/zlog/zlog.iml" filepath="$PROJECT_DIR$/zlog/zlog.iml" />
     </modules>
   </component>
