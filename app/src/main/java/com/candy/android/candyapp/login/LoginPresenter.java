@@ -38,7 +38,7 @@ public class LoginPresenter {
 
     public void removeParent() {
         this.fragment = null;
-        if (!loginSubscription.isUnsubscribed()) {
+        if (loginSubscription != null && !loginSubscription.isUnsubscribed()) {
             loginSubscription.unsubscribe();
         }
     }
