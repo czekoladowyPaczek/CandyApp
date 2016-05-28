@@ -15,6 +15,7 @@ import rx.Observable;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -53,5 +54,32 @@ public class LoginPresenterTest {
         verify(facebook).loginWithEmailPermission(argument.capture());
         assertEquals(fragment, argument.getValue());
         verify(facebook).onActivityResult(eq(1), eq(1), any(Intent.class));
+    }
+
+    @Test
+    public void shouldUnsubscribeIfLoginInProgress() {
+        when(facebook.loginWithEmailPermission(any(LoginFragment.class))).thenReturn(Observable.never());
+        when(userManager.login(anyString())).thenReturn(Observable.never());
+
+        presenter.startFacebookLogin();
+        presenter.removeParent();
+    }
+
+    @Test
+    public void shouldNotUnsubscribeIfLoginNotInProgress() {
+        when(facebook.loginWithEmailPermission(any(LoginFragment.class))).thenReturn(Observable.never());
+        when(userManager.login(anyString())).thenReturn(Observable.never());
+
+        presenter.removeParent();
+    }
+
+    @Test
+    public void shouldSubscribeIfLoginWasInProgressAndRecreated() {
+        when(facebook.loginWithEmailPermission(any(LoginFragment.class))).thenReturn(Observable.never());
+        when(userManager.login(anyString())).thenReturn(Observable.never());
+
+        presenter.startFacebookLogin();
+        presenter.removeParent();
+        presenter.setParent(fragment);
     }
 }

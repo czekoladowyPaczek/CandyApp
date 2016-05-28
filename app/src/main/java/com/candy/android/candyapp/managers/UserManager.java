@@ -20,7 +20,16 @@ public class UserManager {
         this.storage = storage;
     }
 
+    public boolean isLoggedIn() {
+        return storage.getToken() != null;
+    }
+
+    public String getToken() {
+        return storage.getToken();
+    }
+
     public Observable<ModelUserLogin> login(String token) {
-        return null;
+        return api.login(token)
+                .doOnNext(user -> storage.saveUserToken(user.getToken()));
     }
 }

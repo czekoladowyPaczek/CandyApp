@@ -11,6 +11,8 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -32,6 +34,32 @@ public class UserManagerTest {
         storage = mock(UserStorage.class);
 
         manager = new UserManager(api, storage);
+    }
+
+    @Test
+    public void userLoggedIn() {
+        when(storage.getToken()).thenReturn("test_token");
+
+        assertTrue(manager.isLoggedIn());
+    }
+
+    @Test
+    public void userNotLoggedIn() {
+        when(storage.getToken()).thenReturn(null);
+
+        assertFalse(manager.isLoggedIn());
+    }
+
+    @Test
+    public void shouldReturnTokenIfUserIsLoggedIn() {
+        when(storage.getToken()).thenReturn("test_token");
+
+        assertEquals("test_token", manager.getToken());
+    }
+
+    @Test
+    public void shouldNotReturnTokenIfUserIsNotLoggedIn() {
+        assertEquals(null, manager.getToken());
     }
 
     @Test
