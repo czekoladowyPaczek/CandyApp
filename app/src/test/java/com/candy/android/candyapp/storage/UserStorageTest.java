@@ -75,4 +75,24 @@ public class UserStorageTest {
 
         assertEquals(gson.toJson(user), RuntimeEnvironment.application.getSharedPreferences(UserStorage.PREFS_NAME, Context.MODE_PRIVATE).getString(UserStorage.PREF_USER, ""));
     }
+
+    @Test
+    public void shouldGetUser() {
+        long id = 1;
+        String name= "name";
+        String picture = "http://picture.com";
+        String email = "email";
+        List<ModelFriend> friends = new ArrayList<>(1);
+        friends.add(new ModelFriend(1, "friendName", "http://friend.com", ModelFriend.STATUS_ACCEPTED));
+        ModelUser user = new ModelUser(id, name, picture, email, friends);
+        Gson gson = new Gson();
+        RuntimeEnvironment.application.getSharedPreferences(UserStorage.PREFS_NAME, Context.MODE_PRIVATE).edit().putString(UserStorage.PREF_USER, gson.toJson(user)).apply();
+
+        ModelUser actualUser = storage.getUser();
+
+        assertEquals(user.getName(), actualUser.getName());
+        assertEquals(user.getId(), actualUser.getId());
+        assertEquals(user.getEmail(), actualUser.getEmail());
+        assertEquals(user.getFriends().size(), actualUser.getFriends().size());
+    }
 }

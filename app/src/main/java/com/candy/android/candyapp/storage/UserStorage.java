@@ -16,9 +16,11 @@ public class UserStorage {
     public static final String PREF_USER = "com.candy.android.candyapp.user_user";
 
     private Context context;
+    private Gson gson;
 
     public UserStorage(Context context) {
         this.context = context;
+        this.gson = new Gson();
     }
 
     public void saveUserToken(String token) {
@@ -30,8 +32,11 @@ public class UserStorage {
     }
 
     public void saveUser(ModelUser user) {
-        Gson gson = new Gson();
         getPrefs().edit().putString(PREF_USER, gson.toJson(user)).apply();
+    }
+
+    public ModelUser getUser() {
+        return gson.fromJson(getPrefs().getString(PREF_USER, ""), ModelUser.class);
     }
 
     private SharedPreferences getPrefs() {

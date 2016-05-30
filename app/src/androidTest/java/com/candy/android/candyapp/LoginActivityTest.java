@@ -1,12 +1,21 @@
 package com.candy.android.candyapp;
 
+import android.app.Instrumentation;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.candy.android.candyapp.login.LoginActivity;
+import com.candy.android.candyapp.managers.UserManager;
+import com.candy.android.candyapp.testUtils.graph.DaggerFakeActivityComponent;
+import com.candy.android.candyapp.testUtils.graph.FakeActivityComponent;
+import com.candy.android.candyapp.testUtils.graph.FakePresenterModule;
+import com.candy.android.candyapp.testUtils.graph.FakeUserManagerModule;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +25,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Marcin
@@ -25,10 +35,24 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 public class LoginActivityTest {
 
     @Rule
-    public ActivityTestRule<LoginActivity> activityRule = new ActivityTestRule<>(LoginActivity.class);
+    public ActivityTestRule<LoginActivity> activityRule = new ActivityTestRule<>(LoginActivity.class, true, false);
+
+    @Before
+    public void setup() {
+        UserManager manager = mock(UserManager.class);
+        FakeActivityComponent component = DaggerFakeActivityComponent.builder()
+                .fakeUserManagerModule(new FakeUserManagerModule(manager))
+                .fakePresenterModule(new FakePresenterModule())
+                .build();
+
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        CandyApplication app = (CandyApplication) instrumentation.getTargetContext().getApplicationContext();
+        app.setActivityComponent(component);
+    }
 
     @Test
     public void viewsVisiblePortrait() {
+        activityRule.launchActivity(new Intent());
         onView(withId(R.id.iconBig)).check(matches(isDisplayed()));
         onView(withText(R.string.login_welcome)).check(matches(isDisplayed()));
         onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
@@ -36,6 +60,7 @@ public class LoginActivityTest {
 
     @Test
     public void viewsVisibleLandscape() {
+        activityRule.launchActivity(new Intent());
         activityRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         onView(withId(R.id.iconBig)).check(matches(isDisplayed()));
         onView(withText(R.string.login_welcome)).check(matches(isDisplayed()));

@@ -1,5 +1,6 @@
 package com.candy.android.candyapp.api;
 
+import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.model.ModelUserLogin;
 
 import retrofit2.http.GET;
@@ -15,4 +16,7 @@ public interface  CandyApi {
 
     @GET("/user/login")
     Observable<ModelUserLogin> login(@Header("Authorization") String token);
+
+    @GET("/user/profile")
+    Observable<ModelUser> getProfile(@Header("Authorization") String token);
 }
