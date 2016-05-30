@@ -1,5 +1,6 @@
 package com.candy.android.candyapp;
 
+import android.content.pm.ActivityInfo;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -27,7 +28,15 @@ public class LoginActivityTest {
     public ActivityTestRule<LoginActivity> activityRule = new ActivityTestRule<>(LoginActivity.class);
 
     @Test
-    public void viewsVisible() {
+    public void viewsVisiblePortrait() {
+        onView(withId(R.id.iconBig)).check(matches(isDisplayed()));
+        onView(withText(R.string.login_welcome)).check(matches(isDisplayed()));
+        onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void viewsVisibleLandscape() {
+        activityRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         onView(withId(R.id.iconBig)).check(matches(isDisplayed()));
         onView(withText(R.string.login_welcome)).check(matches(isDisplayed()));
         onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
