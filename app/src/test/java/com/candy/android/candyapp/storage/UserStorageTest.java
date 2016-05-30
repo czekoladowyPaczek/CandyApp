@@ -3,6 +3,9 @@ package com.candy.android.candyapp.storage;
 import android.content.Context;
 
 import com.candy.android.candyapp.BuildConfig;
+import com.candy.android.candyapp.model.ModelFriend;
+import com.candy.android.candyapp.model.ModelUser;
+import com.google.gson.Gson;
 
 import org.junit.After;
 import org.junit.Before;
@@ -11,6 +14,9 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
@@ -52,5 +58,21 @@ public class UserStorageTest {
                 .putString(UserStorage.PREF_TOKEN, token)
                 .apply();
         assertEquals(token, storage.getToken());
+    }
+
+    @Test
+    public void shouldSaveUser() {
+        long id = 1;
+        String name= "name";
+        String picture = "http://picture.com";
+        String email = "email";
+        List<ModelFriend> friends = new ArrayList<>(1);
+        friends.add(new ModelFriend(1, "friendName", "http://friend.com", ModelFriend.STATUS_ACCEPTED));
+        ModelUser user = new ModelUser(id, name, picture, email, friends);
+        Gson gson = new Gson();
+
+        storage.saveUser(user);
+
+        assertEquals(gson.toJson(user), RuntimeEnvironment.application.getSharedPreferences(UserStorage.PREFS_NAME, Context.MODE_PRIVATE).getString(UserStorage.PREF_USER, ""));
     }
 }

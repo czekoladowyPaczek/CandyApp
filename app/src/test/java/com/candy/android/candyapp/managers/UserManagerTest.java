@@ -17,6 +17,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -73,6 +75,7 @@ public class UserManagerTest {
         sub.assertNoErrors();
         verify(api).login(token);
         verify(storage).saveUserToken(login.getToken());
+        verify(storage).saveUser(login.getUser());
         assertEquals(login, sub.getOnNextEvents().get(0));
     }
 
@@ -86,6 +89,6 @@ public class UserManagerTest {
 
         sub.assertError(err);
         verify(api).login(token);
-        verify(storage, never()).saveUserToken(anyString());
+        verifyZeroInteractions(storage);
     }
 }

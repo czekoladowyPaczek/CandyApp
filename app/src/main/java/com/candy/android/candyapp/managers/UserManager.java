@@ -30,6 +30,9 @@ public class UserManager {
 
     public Observable<ModelUserLogin> login(String token) {
         return api.login(token)
-                .doOnNext(user -> storage.saveUserToken(user.getToken()));
+                .doOnNext(login -> {
+                    storage.saveUserToken(login.getToken());
+                    storage.saveUser(login.getUser());
+                });
     }
 }

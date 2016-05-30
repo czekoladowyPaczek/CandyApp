@@ -20,6 +20,14 @@ public class ModelUser {
     @SerializedName("friends")
     private List<ModelFriend> friends;
 
+    public ModelUser(long id, String name, String picture, String email, List<ModelFriend> friends) {
+        this.id = id;
+        this.name = name;
+        this.picture = picture;
+        this.email = email;
+        this.friends = friends;
+    }
+
     public long getId() {
         return id;
     }

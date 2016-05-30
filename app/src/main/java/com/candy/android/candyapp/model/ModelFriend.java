@@ -30,6 +30,13 @@ public class ModelFriend {
     @SerializedName("status")
     private String status;
 
+    public ModelFriend(long id, String name, String picture, @FriendStatus String status) {
+        this.id = id;
+        this.name = name;
+        this.picture = picture;
+        this.status = status;
+    }
+
     public long getId() {
         return id;
     }
