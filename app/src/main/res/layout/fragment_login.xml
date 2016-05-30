@@ -15,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:src="@drawable/ic_cart"
+        android:contentDescription="@string/login_welcome"
         app:layout_marginTopPercent="25%"/>
 
     <Button

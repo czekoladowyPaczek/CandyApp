@@ -19,3 +19,15 @@
 
 # Retrolambda https://github.com/evant/gradle-retrolambda
 -dontwarn java.lang.invoke.*
+
+-keep class com.facebook.** {
+   *;
+}
+-keepattributes Signature
+
+-dontwarn sun.misc.Unsafe
+-dontwarn okio.**
+-dontwarn retrofit2.Platform$Java8
+-dontnote android.net.http.*
+-dontnote org.apache.commons.codec.**
+-dontnote org.apache.http.**

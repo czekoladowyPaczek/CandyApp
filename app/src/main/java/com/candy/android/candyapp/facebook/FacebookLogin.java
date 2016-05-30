@@ -3,6 +3,7 @@ package com.candy.android.candyapp.facebook;
 import android.content.Intent;
 
 import com.candy.android.candyapp.login.LoginFragment;
+import com.candy.android.zlog.ZLog;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -18,7 +19,9 @@ import rx.Observable;
  */
 
 public class FacebookLogin {
-    public static String[] PERMISSIONS = {"email"};
+    public static class FacebookCancelException extends Throwable {}
+
+    private static final String[] PERMISSIONS = {"email"};
     private CallbackManager callbackManager;
     private LoginManager loginManager;
 
@@ -41,13 +44,13 @@ public class FacebookLogin {
                 @Override
                 public void onCancel() {
                     if (!subscriber.isUnsubscribed()) {
-                        subscriber.onNext("");
-                        subscriber.onCompleted();
+                        subscriber.onError(new FacebookCancelException());
                     }
                 }
 
                 @Override
                 public void onError(FacebookException error) {
+                    ZLog.e(error.getMessage());
                     if (!subscriber.isUnsubscribed()) {
                         subscriber.onError(error);
                     }

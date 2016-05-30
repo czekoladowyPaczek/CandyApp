@@ -4,4 +4,8 @@
 
     <string name="login_welcome">Create shopping lists and share it with you friends</string>
     <string name="login_facebook">Sign in with Facebook</string>
+    <string name="login_login_in_progress">Loading in&#8239;</string>
+    <string name="login_error_facebook">Some error occurred with Facebook login</string>
+    <string name="login_error_api">Incorrect Facebook token or missing permissions</string>
+    <string name="login_error_connection">Problems with internet connection</string>
 </resources>
