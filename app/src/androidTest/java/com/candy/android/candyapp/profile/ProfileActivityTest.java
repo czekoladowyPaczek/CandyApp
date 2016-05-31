@@ -72,6 +72,5 @@ public class ProfileActivityTest {
         onView(withText(user.getEmail())).check(matches(isDisplayed()));
         onView(withId(R.id.user_profile_image)).check(matches(isDisplayed()));
         onView(withId(R.id.menu_logout)).check(matches(isDisplayed()));
-        onView(withId(android.R.id.home)).check(matches(isDisplayed()));
     }
 }
