@@ -15,9 +15,16 @@ import static org.mockito.Mockito.mock;
 public class FakePresenterModule {
 
     private LoginPresenter loginPresenter;
+    private ProfilePresenter profilePresenter;
 
     public FakePresenterModule(LoginPresenter presenter) {
         this.loginPresenter = presenter;
+        profilePresenter = mock(ProfilePresenter.class);
+    }
+
+    public FakePresenterModule(ProfilePresenter presenter) {
+        this.profilePresenter = presenter;
+        loginPresenter = mock(LoginPresenter.class);
     }
 
     @Provides
@@ -26,7 +33,7 @@ public class FakePresenterModule {
     }
 
     @Provides
-    public ProfilePresenter proideProfilePresenter() {
-        return mock(ProfilePresenter.class);
+    public ProfilePresenter provideProfilePresenter() {
+        return profilePresenter;
     }
 }

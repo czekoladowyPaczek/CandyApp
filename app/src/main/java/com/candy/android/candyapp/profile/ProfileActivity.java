@@ -1,5 +1,6 @@
 package com.candy.android.candyapp.profile;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -8,14 +9,20 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.helper.UiHelper;
+import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.zlog.ZLog;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +48,8 @@ public class ProfileActivity extends AppCompatActivity {
     SwipeRefreshLayout loadingLayout;
     @BindView(R.id.friendsView)
     RecyclerView friendsView;
+    @BindView(R.id.user_profile_email)
+    TextView userEmail;
 
     @Inject
     ProfilePresenter presenter;
@@ -84,9 +93,11 @@ public class ProfileActivity extends AppCompatActivity {
     public void setUserData(ModelUser user) {
         ZLog.e("set data");
         userName.setText(user.getName());
-
+        userEmail.setText(user.getEmail());
+        ZLog.e(user.getPicture());
         if (!TextUtils.isEmpty(user.getPicture())) {
-
+            int imgSize = UiHelper.convertDpToPixel(110, this);
+            ImageLoader.getInstance().displayImage(user.getPicture(), userImage, new ImageSize(imgSize, imgSize));
         }
 
         int oldSize = friends.size();
@@ -94,6 +105,26 @@ public class ProfileActivity extends AppCompatActivity {
         adapter.notifyItemRangeRemoved(0, oldSize);
         friends.addAll(user.getFriends());
         adapter.notifyItemRangeInserted(0, friends.size());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.menu_logout:
+                logout();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.profile_menu, menu);
+        return true;
     }
 
     public void showLoading() {
@@ -106,5 +137,11 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void showError() {
 
+    }
+
+    public void logout() {
+        presenter.logout();
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 }

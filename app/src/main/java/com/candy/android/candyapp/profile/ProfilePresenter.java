@@ -65,4 +65,8 @@ public class ProfilePresenter {
             profileSubscription.unsubscribe();
         }
     }
+
+    public void logout() {
+        manager.logout();
+    }
 }

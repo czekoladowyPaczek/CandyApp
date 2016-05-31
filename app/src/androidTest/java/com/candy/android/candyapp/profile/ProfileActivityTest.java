@@ -10,6 +10,7 @@ import android.support.test.runner.AndroidJUnit4;
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.managers.UserManager;
+import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.testUtils.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.testUtils.graph.FakeActivityComponent;
@@ -22,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
@@ -57,12 +59,19 @@ public class ProfileActivityTest {
 
     @Test
     public void assertVisibleViews() {
-        ModelUser user = new ModelUser(1, "name", "", "email", new ArrayList<>(0));
+        List<ModelFriend> friends = new ArrayList<>(10);
+        for(int i = 0; i < friends.size(); i++) {
+            friends.add(new ModelFriend(i , "Name " + i, "", ModelFriend.STATUS_ACCEPTED));
+        }
+        ModelUser user = new ModelUser(1, "name", "", "email", friends);
 
         activityRule.launchActivity(new Intent());
         activityRule.getActivity().runOnUiThread(() -> activityRule.getActivity().setUserData(user));
 
         onView(withText(user.getName())).check(matches(isDisplayed()));
+        onView(withText(user.getEmail())).check(matches(isDisplayed()));
         onView(withId(R.id.user_profile_image)).check(matches(isDisplayed()));
+        onView(withId(R.id.menu_logout)).check(matches(isDisplayed()));
+        onView(withId(android.R.id.home)).check(matches(isDisplayed()));
     }
 }

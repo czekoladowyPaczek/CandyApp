@@ -66,4 +66,10 @@ public class UserManager {
 
         return profileObservable;
     }
+
+    public void logout() {
+        user = null;
+        token = null;
+        storage.clear();
+    }
 }

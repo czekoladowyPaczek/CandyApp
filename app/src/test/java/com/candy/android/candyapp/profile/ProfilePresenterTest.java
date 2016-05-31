@@ -66,6 +66,13 @@ public class ProfilePresenterTest {
     }
 
     @Test
+    public void shouldLogout() {
+        presenter.logout();
+
+        verify(userManager).logout();
+    }
+
+    @Test
     public void shouldSetDataOnProfileSuccess() {
         ModelUser user = new ModelUser(1, "name", "pic", "email", new ArrayList<>());
         when(userManager.getProfile(anyBoolean())).thenReturn(Observable.just(user));

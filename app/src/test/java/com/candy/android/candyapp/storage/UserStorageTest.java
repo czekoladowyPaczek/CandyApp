@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.storage;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.candy.android.candyapp.BuildConfig;
 import com.candy.android.candyapp.model.ModelFriend;
@@ -63,7 +64,7 @@ public class UserStorageTest {
     @Test
     public void shouldSaveUser() {
         long id = 1;
-        String name= "name";
+        String name = "name";
         String picture = "http://picture.com";
         String email = "email";
         List<ModelFriend> friends = new ArrayList<>(1);
@@ -79,7 +80,7 @@ public class UserStorageTest {
     @Test
     public void shouldGetUser() {
         long id = 1;
-        String name= "name";
+        String name = "name";
         String picture = "http://picture.com";
         String email = "email";
         List<ModelFriend> friends = new ArrayList<>(1);
@@ -94,5 +95,32 @@ public class UserStorageTest {
         assertEquals(user.getId(), actualUser.getId());
         assertEquals(user.getEmail(), actualUser.getEmail());
         assertEquals(user.getFriends().size(), actualUser.getFriends().size());
+    }
+
+    @Test
+    public void shouldClearPrefs() {
+        long id = 1;
+        String name = "name";
+        String picture = "http://picture.com";
+        String email = "email";
+        List<ModelFriend> friends = new ArrayList<>(1);
+        friends.add(new ModelFriend(1, "friendName", "http://friend.com", ModelFriend.STATUS_ACCEPTED));
+        ModelUser user = new ModelUser(id, name, picture, email, friends);
+        Gson gson = new Gson();
+        SharedPreferences prefs = RuntimeEnvironment.application.getSharedPreferences(UserStorage.PREFS_NAME, Context.MODE_PRIVATE);
+
+        prefs.edit()
+                .putString(UserStorage.PREF_USER, gson.toJson(user))
+                .apply();
+
+        String token = "test_token";
+        prefs.edit()
+                .putString(UserStorage.PREF_TOKEN, token)
+                .apply();
+
+        storage.clear();
+
+        assertEquals("", prefs.getString(UserStorage.PREF_USER, ""));
+        assertEquals("", prefs.getString(UserStorage.PREF_TOKEN, ""));
     }
 }

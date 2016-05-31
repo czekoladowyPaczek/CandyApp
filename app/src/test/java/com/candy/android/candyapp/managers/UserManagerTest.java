@@ -166,7 +166,12 @@ public class UserManagerTest {
         verify(api, times(2)).getProfile("Bearer token");
     }
 
+    public void shouldLogout() {
+        manager.logout();
 
+        verify(storage).clear();
+        assertFalse(manager.isLoggedIn());
+    }
 
     private ModelUser getUser() {
         long id = 1;

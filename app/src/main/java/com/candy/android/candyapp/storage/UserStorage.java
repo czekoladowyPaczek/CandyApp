@@ -39,6 +39,10 @@ public class UserStorage {
         return gson.fromJson(getPrefs().getString(PREF_USER, ""), ModelUser.class);
     }
 
+    public void clear() {
+        getPrefs().edit().clear().apply();
+    }
+
     private SharedPreferences getPrefs() {
         return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }

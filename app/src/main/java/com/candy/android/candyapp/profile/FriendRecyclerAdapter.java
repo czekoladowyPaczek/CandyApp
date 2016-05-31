@@ -5,7 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,7 +48,7 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
         private ImageView userImage;
         private TextView userName;
         private TextView userStatus;
-        private Button button;
+        private ImageView statusIcon;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -57,7 +56,7 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
             userImage = (ImageView) itemView.findViewById(R.id.userImage);
             userName = (TextView) itemView.findViewById(R.id.userName);
             userStatus = (TextView) itemView.findViewById(R.id.userStatus);
-            button = (Button) itemView.findViewById(R.id.friendStatus);
+            statusIcon = (ImageView) itemView.findViewById(R.id.friendStatus);
         }
 
         public void bind(ModelFriend friend) {
@@ -65,15 +64,15 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
             switch (friend.getStatus()) {
                 case ModelFriend.STATUS_ACCEPTED:
                     userStatus.setText(R.string.friend_accepted);
-                    button.setVisibility(View.VISIBLE);
+                    statusIcon.setVisibility(View.VISIBLE);
                     break;
                 case ModelFriend.STATUS_INVITED:
                     userStatus.setText(R.string.friend_invited);
-                    button.setVisibility(View.VISIBLE);
+                    statusIcon.setVisibility(View.VISIBLE);
                     break;
                 case ModelFriend.STATUS_WAITING:
                     userStatus.setText(R.string.friend_waiting);
-                    button.setVisibility(View.GONE);
+                    statusIcon.setVisibility(View.GONE);
             }
         }
     }
