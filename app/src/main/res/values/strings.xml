@@ -10,4 +10,8 @@
     <string name="login_error_connection">Problems with internet connection</string>
 
     <string name="profile">Profile</string>
+
+    <string name="friend_accepted">Friend</string>
+    <string name="friend_waiting">Waiting for user acceptance</string>
+    <string name="friend_invited">Accept friend invitation</string>
 </resources>

@@ -34,6 +34,7 @@ public class UserManager {
         if (token == null) {
             token = storage.getToken();
         }
+
         return token;
     }
 
@@ -55,7 +56,7 @@ public class UserManager {
 
     public Observable<ModelUser> getProfile(boolean cache) {
         if (!cache || profileObservable == null) {
-            profileObservable = api.getProfile(getToken())
+            profileObservable = api.getProfile("Bearer " + getToken())
                     .doOnNext(user -> {
                         UserManager.this.user = user;
                         storage.saveUser(user);

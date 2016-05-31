@@ -152,6 +152,7 @@ public class UserManagerTest {
     public void shouldNotGetProfileFromCache() {
         ModelUser user = getUser();
         when(api.getProfile(anyString())).thenReturn(Observable.just(user));
+        when(storage.getToken()).thenReturn("token");
 
         TestSubscriber<ModelUser> sub = new TestSubscriber<>();
         TestSubscriber<ModelUser> cacheSub = new TestSubscriber<>();
@@ -162,7 +163,7 @@ public class UserManagerTest {
         cacheSub.assertNoErrors();
         assertEquals(user, sub.getOnNextEvents().get(0));
         verify(storage, times(2)).saveUser(user);
-        verify(api, times(2)).getProfile(anyString());
+        verify(api, times(2)).getProfile("Bearer token");
     }
 
 
