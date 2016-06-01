@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.login.LoginPresenter;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
@@ -26,11 +27,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.not;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Marcin
@@ -40,16 +48,18 @@ import static org.mockito.Mockito.mock;
 public class ProfileActivityTest {
 
     private UserManager manager;
+    private ProfilePresenter presenter;
 
     @Rule
     public ActivityTestRule<ProfileActivity> activityRule = new ActivityTestRule<>(ProfileActivity.class, true, false);
 
     @Before
     public void setup() {
+        presenter = mock(ProfilePresenter.class);
         manager = mock(UserManager.class);
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakeUserManagerModule(new FakeUserManagerModule(manager))
-                .fakePresenterModule(new FakePresenterModule())
+                .fakePresenterModule(new FakePresenterModule(mock(LoginPresenter.class), presenter))
                 .build();
 
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
@@ -60,8 +70,8 @@ public class ProfileActivityTest {
     @Test
     public void assertVisibleViews() {
         List<ModelFriend> friends = new ArrayList<>(10);
-        for(int i = 0; i < friends.size(); i++) {
-            friends.add(new ModelFriend(i , "Name " + i, "", ModelFriend.STATUS_ACCEPTED));
+        for (int i = 0; i < friends.size(); i++) {
+            friends.add(new ModelFriend(i, "Name " + i, "", ModelFriend.STATUS_ACCEPTED));
         }
         ModelUser user = new ModelUser(1, "name", "", "email", friends);
 
@@ -72,5 +82,37 @@ public class ProfileActivityTest {
         onView(withText(user.getEmail())).check(matches(isDisplayed()));
         onView(withId(R.id.user_profile_image)).check(matches(isDisplayed()));
         onView(withId(R.id.menu_logout)).check(matches(isDisplayed()));
+        onView(withId(R.id.add_friend_button)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void shouldAddNewFriend() {
+        activityRule.launchActivity(new Intent());
+        onView(withId(R.id.add_friend_container)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.add_friend_button)).perform(click());
+        onView(withId(R.id.add_friend_container)).check(matches(isDisplayed()));
+        onView(withId(R.id.add_friend_email)).perform(typeText("someEmail@email.com"));
+        onView(withId(R.id.add_friend_accept)).perform(click());
+        verify(presenter).inviteFriend("someEmail@email.com", false);
+        onView(withId(R.id.add_friend_container)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.add_friend_button)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void shouldNotAddNewFriendWithEmptyEmail() {
+        activityRule.launchActivity(new Intent());
+        onView(withId(R.id.add_friend_container)).check(matches(not(isDisplayed())));
+        onView(withId(R.id.add_friend_button)).perform(click());
+        onView(withId(R.id.add_friend_container)).check(matches(isDisplayed()));
+        onView(withId(R.id.add_friend_accept)).perform(click());
+        verify(presenter, never()).inviteFriend(anyString(), anyBoolean());
+    }
+
+    @Test
+    public void shouldShowLoadingDialog() throws Throwable {
+        activityRule.launchActivity(new Intent());
+        activityRule.runOnUiThread(() -> activityRule.getActivity().showLoadingDialog(R.string.profile_message_inviting));
+
+        onView(withText(R.string.profile_message_inviting)).check(matches(isDisplayed()));
     }
 }

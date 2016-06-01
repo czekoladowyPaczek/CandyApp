@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.request.RequestInviteFriend;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.model.ModelUserLogin;
@@ -18,8 +19,10 @@ import rx.observers.TestSubscriber;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -166,11 +169,69 @@ public class UserManagerTest {
         verify(api, times(2)).getProfile("Bearer token");
     }
 
+    @Test
     public void shouldLogout() {
         manager.logout();
 
         verify(storage).clear();
         assertFalse(manager.isLoggedIn());
+    }
+
+    @Test
+    public void shouldSaveFriendsOnSuccessfulFriendInvitation() {
+        ModelUser user = getUser();
+        when(storage.getUser()).thenReturn(user);
+        List<ModelFriend> friends = new ArrayList<>();
+        when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.just(friends));
+
+        manager.getUser();
+        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        manager.inviteFriend("email@email.com", true).subscribe(sub);
+
+        sub.assertNoErrors();
+        verify(api).inviteFriend(anyString(), any(RequestInviteFriend.class));
+        assertEquals(friends, sub.getOnNextEvents().get(0));
+        verify(storage).saveUser(any(ModelUser.class));
+        assertEquals(0, manager.getUser().getFriends().size());
+    }
+
+    @Test
+    public void shouldNotSaveFriendsOnErrorFriendInvitation() {
+        ModelUser user = getUser();
+        when(storage.getUser()).thenReturn(user);
+        Throwable err = new Throwable("");
+        when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.error(err));
+
+        manager.getUser();
+        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        manager.inviteFriend("email@email.com", true).subscribe(sub);
+
+        verify(api).inviteFriend(anyString(), any(RequestInviteFriend.class));
+        sub.assertError(err);
+        verify(storage, never()).saveUser(any(ModelUser.class));
+        assertEquals(user.getFriends().size(), manager.getUser().getFriends().size());
+    }
+
+    @Test
+    public void shouldReturnCachedObservable() {
+        when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.never());
+        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        manager.inviteFriend("email@email.com", true).subscribe(sub);
+        TestSubscriber<List<ModelFriend>> sub2 = new TestSubscriber<>();
+        manager.inviteFriend("email@email.com", true).subscribe(sub2);
+
+        verify(api, times(1)).inviteFriend(anyString(), any(RequestInviteFriend.class));
+    }
+
+    @Test
+    public void shouldReturnFreshObservable() {
+        when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.never());
+        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        manager.inviteFriend("email@email.com", true).subscribe(sub);
+        TestSubscriber<List<ModelFriend>> sub2 = new TestSubscriber<>();
+        manager.inviteFriend("email@email.com", false).subscribe(sub2);
+
+        verify(api, times(2)).inviteFriend(anyString(), any(RequestInviteFriend.class));
     }
 
     private ModelUser getUser() {

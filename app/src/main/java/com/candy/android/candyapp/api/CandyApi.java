@@ -1,10 +1,16 @@
 package com.candy.android.candyapp.api;
 
+import com.candy.android.candyapp.api.request.RequestInviteFriend;
+import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.model.ModelUserLogin;
 
+import java.util.List;
+
+import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.POST;
 import rx.Observable;
 
 /**
@@ -19,4 +25,7 @@ public interface  CandyApi {
 
     @GET("/user/profile")
     Observable<ModelUser> getProfile(@Header("Authorization") String token);
+
+    @POST("/friend")
+    Observable<List<ModelFriend>> inviteFriend(@Header("Authorization") String token, @Body RequestInviteFriend body);
 }

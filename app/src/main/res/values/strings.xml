@@ -11,6 +11,11 @@
 
     <string name="profile">Profile</string>
     <string name="profile_logout">Logout"</string>
+    <string name="profile_friend_add">Invite new friend</string>
+    <string name="profile_friend_email">Email</string>
+    <string name="profile_error_email_missing">Enter email</string>
+    <string name="profile_error_email_exist">User with this email is invited</string>
+    <string name="profile_message_inviting">Sending invitation</string>
 
     <string name="friend_accepted">Friend</string>
     <string name="friend_waiting">Waiting for user acceptance</string>

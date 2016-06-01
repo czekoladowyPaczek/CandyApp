@@ -2,6 +2,7 @@ package com.candy.android.candyapp.profile;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.helper.UiHelper;
 import com.candy.android.candyapp.model.ModelFriend;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 
 import java.util.List;
 
@@ -21,11 +25,13 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
 
     private List<ModelFriend> friends;
     private LayoutInflater inflater;
+    private int imageSize;
 
     public FriendRecyclerAdapter(Context context, List<ModelFriend> friends) {
         this.friends = friends;
 
         inflater = LayoutInflater.from(context);
+        imageSize = UiHelper.convertDpToPixel(40, context);
     }
 
     @Override
@@ -35,7 +41,7 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.bind(friends.get(position));
+        holder.bind(friends.get(position), imageSize);
     }
 
     @Override
@@ -48,7 +54,6 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
         private ImageView userImage;
         private TextView userName;
         private TextView userStatus;
-        private ImageView statusIcon;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -56,23 +61,23 @@ public class FriendRecyclerAdapter extends RecyclerView.Adapter<FriendRecyclerAd
             userImage = (ImageView) itemView.findViewById(R.id.userImage);
             userName = (TextView) itemView.findViewById(R.id.userName);
             userStatus = (TextView) itemView.findViewById(R.id.userStatus);
-            statusIcon = (ImageView) itemView.findViewById(R.id.friendStatus);
         }
 
-        public void bind(ModelFriend friend) {
+        public void bind(ModelFriend friend, int imageSize) {
             userName.setText(friend.getName());
             switch (friend.getStatus()) {
                 case ModelFriend.STATUS_ACCEPTED:
                     userStatus.setText(R.string.friend_accepted);
-                    statusIcon.setVisibility(View.VISIBLE);
                     break;
                 case ModelFriend.STATUS_INVITED:
                     userStatus.setText(R.string.friend_invited);
-                    statusIcon.setVisibility(View.VISIBLE);
                     break;
                 case ModelFriend.STATUS_WAITING:
                     userStatus.setText(R.string.friend_waiting);
-                    statusIcon.setVisibility(View.GONE);
+            }
+            userImage.setImageResource(R.drawable.user_default);
+            if (!TextUtils.isEmpty(friend.getPicture())) {
+                ImageLoader.getInstance().displayImage(friend.getPicture(), userImage, new ImageSize(imageSize, imageSize));
             }
         }
     }

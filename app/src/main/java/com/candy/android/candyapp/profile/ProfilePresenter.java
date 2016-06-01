@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.managers.UserManager;
 
 import rx.Subscription;
@@ -20,6 +21,7 @@ public class ProfilePresenter {
     private ProfileActivity activity;
 
     private Subscription profileSubscription;
+    private Subscription friendInvitation;
 
     public ProfilePresenter(UserManager manager) {
         this.manager = manager;
@@ -68,5 +70,20 @@ public class ProfilePresenter {
 
     public void logout() {
         manager.logout();
+    }
+
+    public void inviteFriend(String email, boolean cache) {
+        if (friendInvitation != null && !friendInvitation.isUnsubscribed()) {
+            friendInvitation.unsubscribe();
+        }
+        activity.showLoadingDialog(R.string.profile_message_inviting);
+        friendInvitation = manager.inviteFriend(email, cache)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe();
+    }
+
+    public void friendDialogCancelled() {
+
     }
 }

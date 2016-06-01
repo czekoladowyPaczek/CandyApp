@@ -47,4 +47,8 @@ public class ModelUser {
     public List<ModelFriend> getFriends() {
         return friends;
     }
+
+    public void setFriends(List<ModelFriend> friends) {
+        this.friends = friends;
+    }
 }

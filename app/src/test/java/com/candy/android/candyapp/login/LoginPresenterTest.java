@@ -5,6 +5,7 @@ import android.content.Intent;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.facebook.FacebookLogin;
 import com.candy.android.candyapp.managers.UserManager;
+import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUserLogin;
 import com.candy.android.candyapp.testUtils.RxSchedulersOverrideRule;
 import com.facebook.FacebookException;
@@ -13,6 +14,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+
+import java.util.List;
 
 import rx.Observable;
 

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     android:animateLayoutChanges="true">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
-        android:layout_height="260dp">
+        android:layout_height="240dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -20,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_alignParentTop="true"
-                android:visibility="visible" />
+                android:visibility="visible"/>
 
             <ImageView
                 android:id="@+id/user_profile_image"
@@ -29,7 +30,7 @@
                 android:layout_centerInParent="true"
                 android:layout_gravity="center"
                 android:background="@color/colorPrimary"
-                android:src="@drawable/profile_back" />
+                android:src="@drawable/user_default"/>
 
             <TextView
                 android:id="@+id/user_profile_name"
@@ -38,9 +39,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/user_profile_image"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="15dp"
-                android:text="test text"
-                android:textColor="?android:attr/textColorPrimary" />
+                android:layout_marginTop="8dp"
+                android:textColor="?android:attr/textColorPrimary"
+                tools:text="test text"/>
 
             <TextView
                 android:id="@+id/user_profile_email"
@@ -49,11 +50,9 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/user_profile_name"
                 android:layout_centerHorizontal="true"
-                android:text="test text"
-                android:textColor="?android:attr/textColorPrimary" />
-
+                android:textColor="?android:attr/textColorPrimary"
+                tools:text="test text"/>
         </RelativeLayout>
-
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
@@ -69,4 +68,64 @@
             tools:listitem="@layout/view_list_friend"/>
     </android.support.v4.widget.SwipeRefreshLayout>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_friend_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:src="@drawable/ic_person_add_white_24dp"
+        app:borderWidth="0dp"
+        app:elevation="4dp"
+        app:fabSize="normal"/>
+
+    <RelativeLayout
+        android:id="@+id/add_friend_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/colorPrimary"
+        android:visibility="gone"
+        app:elevation="4dp">
+
+        <TextView
+            android:id="@+id/add_friend_title"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="@dimen/activity_horizontal_margin"
+            android:text="@string/profile_friend_add"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add_friend_accept"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:src="@drawable/ic_person_add_white_24dp"
+            app:borderWidth="0dp"
+            app:elevation="0dp"
+            app:fabSize="normal"/>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/add_friend_email_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/add_friend_title"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_toLeftOf="@id/add_friend_accept">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/add_friend_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/profile_friend_email"
+                android:inputType="textEmailAddress"/>
+        </android.support.design.widget.TextInputLayout>
+    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

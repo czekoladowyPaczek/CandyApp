@@ -2,6 +2,7 @@ package com.candy.android.candyapp.profile;
 
 import android.os.Bundle;
 
+import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.testUtils.RxSchedulersOverrideRule;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import rx.Observable;
 
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -136,5 +138,18 @@ public class ProfilePresenterTest {
         presenter.removeParent();
 
         verify(bundle).putBoolean(ProfilePresenter.SAVE_PROFILE_LOADING, false);
+    }
+
+    @Test
+    public void shouldAddFriend() {
+        ModelUser user = new ModelUser(1, "name", "pic", "email", new ArrayList<>());
+        when(userManager.getUser()).thenReturn(user);
+        when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.never());
+        presenter.setParent(activity, null);
+
+        presenter.inviteFriend("email@email.com", false);
+
+        verify(userManager).inviteFriend("email@email.com", false);
+        verify(activity).showLoadingDialog(R.string.profile_message_inviting);
     }
 }
