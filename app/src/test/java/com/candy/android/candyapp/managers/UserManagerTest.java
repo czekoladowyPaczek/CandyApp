@@ -185,12 +185,12 @@ public class UserManagerTest {
         when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.just(friends));
 
         manager.getUser();
-        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", true).subscribe(sub);
 
         sub.assertNoErrors();
         verify(api).inviteFriend(anyString(), any(RequestInviteFriend.class));
-        assertEquals(friends, sub.getOnNextEvents().get(0));
+        assertEquals(friends, sub.getOnNextEvents().get(0).getFriends());
         verify(storage).saveUser(any(ModelUser.class));
         assertEquals(0, manager.getUser().getFriends().size());
     }
@@ -203,7 +203,7 @@ public class UserManagerTest {
         when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.error(err));
 
         manager.getUser();
-        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", true).subscribe(sub);
 
         verify(api).inviteFriend(anyString(), any(RequestInviteFriend.class));
@@ -215,9 +215,9 @@ public class UserManagerTest {
     @Test
     public void shouldReturnCachedObservable() {
         when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.never());
-        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", true).subscribe(sub);
-        TestSubscriber<List<ModelFriend>> sub2 = new TestSubscriber<>();
+        TestSubscriber<ModelUser> sub2 = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", true).subscribe(sub2);
 
         verify(api, times(1)).inviteFriend(anyString(), any(RequestInviteFriend.class));
@@ -226,15 +226,15 @@ public class UserManagerTest {
     @Test
     public void shouldReturnFreshObservable() {
         when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.never());
-        TestSubscriber<List<ModelFriend>> sub = new TestSubscriber<>();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", true).subscribe(sub);
-        TestSubscriber<List<ModelFriend>> sub2 = new TestSubscriber<>();
+        TestSubscriber<ModelUser> sub2 = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", false).subscribe(sub2);
 
         verify(api, times(2)).inviteFriend(anyString(), any(RequestInviteFriend.class));
     }
 
-    private ModelUser getUser() {
+    public static ModelUser getUser() {
         long id = 1;
         String name= "name";
         String picture = "http://picture.com";

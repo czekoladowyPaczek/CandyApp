@@ -4,21 +4,28 @@ import android.os.Bundle;
 
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.managers.UserManager;
+import com.candy.android.candyapp.managers.UserManagerTest;
+import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.testUtils.RxSchedulersOverrideRule;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import rx.Observable;
 
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -151,5 +158,41 @@ public class ProfilePresenterTest {
 
         verify(userManager).inviteFriend("email@email.com", false);
         verify(activity).showLoadingDialog(R.string.profile_message_inviting);
+    }
+
+    @Test
+    public void shouldCallFriendInviteWhenFriendInviteWasCalledBeforeRecrete() {
+        when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.never());
+        presenter.setParent(activity, null);
+        presenter.inviteFriend("", false);
+
+        Bundle bundle = mock(Bundle.class);
+        when(bundle.getBoolean(ProfilePresenter.SAVE_INVITATION, false)).thenReturn(true);
+        presenter.onSaveInstanceState(bundle);
+        presenter.removeParent();
+        presenter.setParent(activity, bundle);
+
+        verify(bundle).getBoolean(ProfilePresenter.SAVE_INVITATION, false);
+        verify(userManager).inviteFriend(anyString(), eq(true));
+    }
+
+    @Test
+    public void shouldUpdateUserWhenFriendInvitationIsSuccess() {
+        presenter.setParent(activity, null);
+        List<ModelFriend> friends = new ArrayList<>(2);
+        friends.add(new ModelFriend(1, "name", "", ModelFriend.STATUS_INVITED));
+        friends.add(new ModelFriend(2, "name 1", "", ModelFriend.STATUS_INVITED));
+        ModelUser user = UserManagerTest.getUser();
+        user.setFriends(friends);
+        when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.just(user));
+        ModelUser modelUser = UserManagerTest.getUser();
+        when(userManager.getUser()).thenReturn(modelUser);
+
+        presenter.inviteFriend("", false);
+
+        ArgumentCaptor<ModelUser> captor = ArgumentCaptor.forClass(ModelUser.class);
+        verify(activity).removeDialog();
+        verify(activity, times(2)).setUserData(captor.capture());
+        assertEquals(2, captor.getValue().getFriends().size());
     }
 }

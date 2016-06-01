@@ -2,12 +2,9 @@ package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
 import com.candy.android.candyapp.api.request.RequestInviteFriend;
-import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.model.ModelUserLogin;
 import com.candy.android.candyapp.storage.UserStorage;
-
-import java.util.List;
 
 import rx.Observable;
 
@@ -24,7 +21,7 @@ public class UserManager {
     private ModelUser user;
 
     private Observable<ModelUser> profileObservable;
-    private Observable<List<ModelFriend>> friendInvitationObservable;
+    private Observable<ModelUser> friendInvitationObservable;
 
     public UserManager(CandyApi api, UserStorage storage) {
         this.api = api;
@@ -78,13 +75,14 @@ public class UserManager {
         storage.clear();
     }
 
-    public Observable<List<ModelFriend>> inviteFriend(String email, boolean cache) {
+    public Observable<ModelUser> inviteFriend(String email, boolean cache) {
         if (!cache || friendInvitationObservable == null) {
             friendInvitationObservable = api.inviteFriend("Bearer " + getToken(), new RequestInviteFriend(email))
-                    .doOnNext(friends -> {
+                    .flatMap(friends -> {
                         ModelUser user = getUser();
                         user.setFriends(friends);
                         storage.saveUser(user);
+                        return Observable.just(user);
                     })
                     .cache();
         }

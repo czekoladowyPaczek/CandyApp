@@ -122,6 +122,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         presenter.removeParent();
+        removeDialog();
         super.onDestroy();
     }
 
@@ -203,6 +204,16 @@ public class ProfileActivity extends AppCompatActivity {
 
     public void showLoadingDialog(@StringRes int res) {
         friendDialog = ProgressDialog.show(this, null, getString(res), true, true, v -> presenter.friendDialogCancelled());
+    }
+
+    public void removeDialog() {
+        if (friendDialog != null && friendDialog.isShowing()) {
+            try {
+                friendDialog.dismiss();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void showAddFriendView(boolean animate) {

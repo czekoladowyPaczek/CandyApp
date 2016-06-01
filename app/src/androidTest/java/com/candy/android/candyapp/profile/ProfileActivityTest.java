@@ -107,12 +107,4 @@ public class ProfileActivityTest {
         onView(withId(R.id.add_friend_accept)).perform(click());
         verify(presenter, never()).inviteFriend(anyString(), anyBoolean());
     }
-
-    @Test
-    public void shouldShowLoadingDialog() throws Throwable {
-        activityRule.launchActivity(new Intent());
-        activityRule.runOnUiThread(() -> activityRule.getActivity().showLoadingDialog(R.string.profile_message_inviting));
-
-        onView(withText(R.string.profile_message_inviting)).check(matches(isDisplayed()));
-    }
 }
