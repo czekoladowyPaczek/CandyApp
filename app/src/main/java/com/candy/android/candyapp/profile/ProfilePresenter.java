@@ -5,13 +5,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.managers.UserManager;
-import com.candy.android.zlog.ZLog;
+import com.candy.android.candyapp.model.ModelUser;
 
-import java.io.IOException;
-
-import okhttp3.ResponseBody;
 import retrofit2.adapter.rxjava.HttpException;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -43,7 +42,7 @@ public class ProfilePresenter {
                 loadProfile(true);
             }
             if (savedInstance.getBoolean(SAVE_INVITATION, false)) {
-                inviteFriend("" ,true);
+                inviteFriend("", true);
             }
         }
     }
@@ -61,14 +60,18 @@ public class ProfilePresenter {
                             activity.setUserData(user);
                         },
                         error -> {
-                            error.printStackTrace();
                             activity.cancelLoading();
-                            activity.showError();
+                            if (error instanceof HttpException) {
+                                activity.showError(R.string.error_unknown);
+                            } else {
+                                activity.showError(R.string.error_connection);
+                            }
                         });
     }
 
     public void onSaveInstanceState(Bundle instance) {
         instance.putBoolean(SAVE_PROFILE_LOADING, profileSubscription != null && !profileSubscription.isUnsubscribed());
+        instance.putBoolean(SAVE_INVITATION, friendInvitation != null && !friendInvitation.isUnsubscribed());
     }
 
     public void removeParent() {
@@ -90,23 +93,38 @@ public class ProfilePresenter {
             friendInvitation.unsubscribe();
         }
         activity.showLoadingDialog(R.string.profile_message_inviting);
-        friendInvitation = manager.inviteFriend(email, cache)
-                .subscribeOn(Schedulers.io())
+        Observable<ModelUser> call = manager.inviteFriend(email, cache);
+        friendInvitation = subscribeToFriendCall(call);
+
+    }
+
+    private Subscription subscribeToFriendCall(Observable<ModelUser> friendCall) {
+        return friendCall.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(user -> {
                     activity.setUserData(user);
                     activity.removeDialog();
                 }, error -> {
-                    ZLog.e("onError");
-                    if (error instanceof HttpException) {
-                        ResponseBody body = ((HttpException) error).response().errorBody();
-                        try {
-                            ZLog.e(body.string());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        ZLog.e("some other");
+                    activity.removeDialog();
+                    ModelError model = ModelError.fromRetrofit(error);
+                    switch (model.getCode()) {
+                        case ModelError.INTERNET_CONNECTION:
+                            activity.showError(R.string.error_connection);
+                            break;
+                        case ModelError.MISSING_PROPERTIES:
+                            activity.showError(R.string.error_internal);
+                            break;
+                        case ModelError.ALREADY_FRIEND:
+                            activity.showError(R.string.error_already_friend);
+                            break;
+                        case ModelError.NO_USER:
+                            activity.showError(R.string.error_no_user);
+                            break;
+                        case ModelError.NOT_INVITED:
+                            activity.showError(R.string.error_not_invited);
+                            break;
+                        default:
+                            activity.showError(R.string.error_unknown);
                     }
                 });
     }

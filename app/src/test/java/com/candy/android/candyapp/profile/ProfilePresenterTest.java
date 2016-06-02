@@ -20,7 +20,9 @@ import java.util.List;
 import rx.Observable;
 
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -107,34 +109,40 @@ public class ProfilePresenterTest {
         verify(activity).setUserData(null);
         verify(activity, never()).setUserData(user);
         verify(userManager).getProfile(true);
-        verify(activity).showError();
+        verify(activity).showError(anyInt());
     }
 
     @Test
-    public void assertLifecycleWhenProfileCallInProgress() {
+    public void assertLifecycleWhenCallsInProgress() {
         when(userManager.getProfile(anyBoolean())).thenReturn(Observable.never());
+        when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.never());
 
         presenter.setParent(activity, null);
         presenter.loadProfile(true);
+        presenter.inviteFriend("", true);
         Bundle bundle = mock(Bundle.class);
         presenter.onSaveInstanceState(bundle);
         presenter.removeParent();
 
         verify(bundle).putBoolean(ProfilePresenter.SAVE_PROFILE_LOADING, true);
+        verify(bundle).putBoolean(ProfilePresenter.SAVE_INVITATION, true);
     }
 
     @Test
-    public void assertLifecycleWhenProfileCallFinished() {
+    public void assertLifecycleWhenCallsFinished() {
         ModelUser user = new ModelUser(1, "name", "pic", "email", new ArrayList<>());
         when(userManager.getProfile(anyBoolean())).thenReturn(Observable.just(user));
+        when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.just(user));
 
         presenter.setParent(activity, null);
         presenter.loadProfile(true);
+        presenter.inviteFriend("", true);
         Bundle bundle = mock(Bundle.class);
         presenter.onSaveInstanceState(bundle);
         presenter.removeParent();
 
         verify(bundle).putBoolean(ProfilePresenter.SAVE_PROFILE_LOADING, false);
+        verify(bundle).putBoolean(ProfilePresenter.SAVE_INVITATION, false);
     }
 
     @Test
@@ -145,6 +153,7 @@ public class ProfilePresenterTest {
         presenter.removeParent();
 
         verify(bundle).putBoolean(ProfilePresenter.SAVE_PROFILE_LOADING, false);
+        verify(bundle).putBoolean(ProfilePresenter.SAVE_INVITATION, false);
     }
 
     @Test
@@ -161,7 +170,7 @@ public class ProfilePresenterTest {
     }
 
     @Test
-    public void shouldCallFriendInviteWhenFriendInviteWasCalledBeforeRecrete() {
+    public void shouldCallFriendInviteWhenFriendInviteWasCalledBeforeRecreate() {
         when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.never());
         presenter.setParent(activity, null);
         presenter.inviteFriend("", false);
@@ -185,8 +194,6 @@ public class ProfilePresenterTest {
         ModelUser user = UserManagerTest.getUser();
         user.setFriends(friends);
         when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.just(user));
-        ModelUser modelUser = UserManagerTest.getUser();
-        when(userManager.getUser()).thenReturn(modelUser);
 
         presenter.inviteFriend("", false);
 
@@ -194,5 +201,18 @@ public class ProfilePresenterTest {
         verify(activity).removeDialog();
         verify(activity, times(2)).setUserData(captor.capture());
         assertEquals(2, captor.getValue().getFriends().size());
+    }
+
+    @Test
+    public void shouldShowErrorWhenUserInviteFailed() {
+        presenter.setParent(activity, null);
+
+        when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.error(new Throwable()));
+
+        presenter.inviteFriend("", false);
+
+        verify(activity).removeDialog();
+        verify(activity, times(1)).setUserData(any(ModelUser.class));
+        verify(activity).showError(anyInt());
     }
 }

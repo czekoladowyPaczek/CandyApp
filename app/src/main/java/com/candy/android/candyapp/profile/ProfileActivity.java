@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -50,6 +51,8 @@ public class ProfileActivity extends AppCompatActivity {
     public static final String FRIEND_VIEW_VISIBLE = "com.candy.android.friend_visible";
     public static final String FRIEND_EMAIL = "com.candy.android.friend_email";
 
+    @BindView(R.id.root)
+    View root;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.user_profile_image)
@@ -192,8 +195,8 @@ public class ProfileActivity extends AppCompatActivity {
         loadingLayout.setRefreshing(false);
     }
 
-    public void showError() {
-
+    public void showError(@StringRes int error) {
+        Snackbar.make(root, error, Snackbar.LENGTH_LONG).show();
     }
 
     public void logout() {
