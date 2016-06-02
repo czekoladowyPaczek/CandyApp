@@ -134,6 +134,15 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onDestroy() {
         presenter.removeParent();
         removeDialog();
+
+        if (friendActionDialog != null) {
+            try {
+                friendActionDialog.dismiss();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        }
+
         super.onDestroy();
     }
 
@@ -224,7 +233,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (friendDialog != null && friendDialog.isShowing()) {
             try {
                 friendDialog.dismiss();
-            } catch (IllegalStateException e) {
+            } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
