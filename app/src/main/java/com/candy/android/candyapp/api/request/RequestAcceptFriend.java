@@ -5,9 +5,9 @@ package com.candy.android.candyapp.api.request;
  */
 
 public class RequestAcceptFriend {
-    private long id;
+    private long userId;
 
     public RequestAcceptFriend(long id) {
-        this.id = id;
+        this.userId = id;
     }
 }
