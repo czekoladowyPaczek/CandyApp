@@ -33,4 +33,6 @@
     <string name="friend_accepted">Friend</string>
     <string name="friend_waiting">Waiting for user acceptance</string>
     <string name="friend_invited">Accept friend invitation</string>
+
+    <string name="shop_no_items">You don\'t have any shopping list. \nCreate new.</string>
 </resources>
