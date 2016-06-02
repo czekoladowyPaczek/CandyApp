@@ -1,5 +1,6 @@
 package com.candy.android.candyapp.api;
 
+import com.candy.android.candyapp.api.request.RequestAcceptFriend;
 import com.candy.android.candyapp.api.request.RequestInviteFriend;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
@@ -8,9 +9,11 @@ import com.candy.android.candyapp.model.ModelUserLogin;
 import java.util.List;
 
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import rx.Observable;
 
 /**
@@ -28,4 +31,10 @@ public interface  CandyApi {
 
     @POST("/friend")
     Observable<List<ModelFriend>> inviteFriend(@Header("Authorization") String token, @Body RequestInviteFriend body);
+
+    @POST("/friend")
+    Observable<List<ModelFriend>> acceptFriend(@Header("Authorization") String token, @Body RequestAcceptFriend body);
+
+    @DELETE("/friend/{id}")
+    Observable<List<ModelFriend>> deleteFriend(@Header("Authorization") String token, @Path("id") long id);
 }

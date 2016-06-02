@@ -13,6 +13,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,6 +51,7 @@ import butterknife.ButterKnife;
 public class ProfileActivity extends AppCompatActivity {
     public static final String FRIEND_VIEW_VISIBLE = "com.candy.android.friend_visible";
     public static final String FRIEND_EMAIL = "com.candy.android.friend_email";
+    public static final String FRIEND_SELECTED = "com.candy.android.friend_selected";
 
     @BindView(R.id.root)
     View root;
@@ -83,6 +85,8 @@ public class ProfileActivity extends AppCompatActivity {
     private FriendRecyclerAdapter adapter;
 
     private Dialog friendDialog;
+    private Dialog friendActionDialog;
+    private ModelFriend selectedFriend;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,7 +100,7 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         friends = new ArrayList<>();
-        adapter = new FriendRecyclerAdapter(this, friends);
+        adapter = new FriendRecyclerAdapter(this, friends, position -> showFriendActionChoice(friends.get(position)));
         friendsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         friendsView.setAdapter(adapter);
 
@@ -116,6 +120,10 @@ public class ProfileActivity extends AppCompatActivity {
             if (savedInstanceState.getBoolean(FRIEND_VIEW_VISIBLE, false)) {
                 showAddFriendView(false);
                 friendEmail.setText(savedInstanceState.getString(FRIEND_EMAIL, ""));
+            }
+
+            if (savedInstanceState.containsKey(FRIEND_SELECTED)) {
+                showFriendActionChoice(savedInstanceState.getParcelable(FRIEND_SELECTED));
             }
         }
 
@@ -137,6 +145,9 @@ public class ProfileActivity extends AppCompatActivity {
         if (container.getVisibility() == View.VISIBLE) {
             outState.putBoolean(FRIEND_VIEW_VISIBLE, true);
             outState.putString(FRIEND_EMAIL, friendEmail.getText().toString());
+        }
+        if (selectedFriend != null) {
+            outState.putParcelable(FRIEND_SELECTED, selectedFriend);
         }
     }
 
@@ -217,6 +228,33 @@ public class ProfileActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void showFriendActionChoice(final ModelFriend friend) {
+        selectedFriend = friend;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+
+                })
+                .setOnDismissListener(dialog -> friendActionDialog = null);
+
+        switch (friend.getStatus()) {
+            case ModelFriend.STATUS_INVITED:
+                builder.setMessage(R.string.profile_accept_message);
+                builder.setPositiveButton(R.string.profile_accept, (dialog, which) -> presenter.acceptFriend(selectedFriend.getId(), false));
+                builder.setNeutralButton(R.string.profile_delete, (dialog, which) -> presenter.deleteFriend(selectedFriend.getId(), false));
+                break;
+            case ModelFriend.STATUS_ACCEPTED:
+            case ModelFriend.STATUS_WAITING:
+                builder.setMessage(R.string.profile_delete_message);
+                builder.setPositiveButton(R.string.profile_delete, (dialog, which) -> presenter.deleteFriend(selectedFriend.getId(), false));
+                break;
+        }
+
+        friendActionDialog = builder.create();
+        friendActionDialog.show();
     }
 
     private void showAddFriendView(boolean animate) {

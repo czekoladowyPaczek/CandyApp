@@ -22,6 +22,8 @@ import rx.schedulers.Schedulers;
 public class ProfilePresenter {
     public static final String SAVE_PROFILE_LOADING = "com.candy.profile_loading";
     public static final String SAVE_INVITATION = "com.candy.profile_invite";
+    public static final String SAVE_ACCEPT = "com.candy.profile_accept";
+    public static final String SAVE_DELETE = "com.candy.profile_delete";
     private UserManager manager;
     private ProfileActivity activity;
 
@@ -43,6 +45,12 @@ public class ProfilePresenter {
             }
             if (savedInstance.getBoolean(SAVE_INVITATION, false)) {
                 inviteFriend("", true);
+            }
+            if (savedInstance.getBoolean(SAVE_ACCEPT, false)) {
+                acceptFriend(1, true);
+            }
+            if (savedInstance.getBoolean(SAVE_DELETE, false)) {
+                deleteFriend(1, true);
             }
         }
     }
@@ -95,7 +103,24 @@ public class ProfilePresenter {
         activity.showLoadingDialog(R.string.profile_message_inviting);
         Observable<ModelUser> call = manager.inviteFriend(email, cache);
         friendInvitation = subscribeToFriendCall(call);
+    }
 
+    public void acceptFriend(long id, boolean cache) {
+        if (friendInvitation != null && !friendInvitation.isUnsubscribed()) {
+            friendInvitation.unsubscribe();
+        }
+        activity.showLoadingDialog(R.string.profile_message_accepting);
+        Observable<ModelUser> call = manager.acceptFriend(id, cache);
+        friendInvitation = subscribeToFriendCall(call);
+    }
+
+    public void deleteFriend(long id, boolean cache) {
+        if (friendInvitation != null && !friendInvitation.isUnsubscribed()) {
+            friendInvitation.unsubscribe();
+        }
+        activity.showLoadingDialog(R.string.profile_message_deleting);
+        Observable<ModelUser> call = manager.deleteFriend(id, cache);
+        friendInvitation = subscribeToFriendCall(call);
     }
 
     private Subscription subscribeToFriendCall(Observable<ModelUser> friendCall) {

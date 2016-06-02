@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.request.RequestAcceptFriend;
 import com.candy.android.candyapp.api.request.RequestInviteFriend;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
@@ -20,6 +21,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -213,7 +215,7 @@ public class UserManagerTest {
     }
 
     @Test
-    public void shouldReturnCachedObservable() {
+    public void shouldReturnCachedObservableFriendInvitation() {
         when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.never());
         TestSubscriber<ModelUser> sub = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", true).subscribe(sub);
@@ -224,7 +226,7 @@ public class UserManagerTest {
     }
 
     @Test
-    public void shouldReturnFreshObservable() {
+    public void shouldReturnFreshObservableFriendInvitation() {
         when(api.inviteFriend(anyString(), any(RequestInviteFriend.class))).thenReturn(Observable.never());
         TestSubscriber<ModelUser> sub = new TestSubscriber<>();
         manager.inviteFriend("email@email.com", true).subscribe(sub);
@@ -232,6 +234,120 @@ public class UserManagerTest {
         manager.inviteFriend("email@email.com", false).subscribe(sub2);
 
         verify(api, times(2)).inviteFriend(anyString(), any(RequestInviteFriend.class));
+    }
+
+    @Test
+    public void shouldSaveFriendsOnSuccessfulAcceptFriend() {
+        ModelUser user = getUser();
+        when(storage.getUser()).thenReturn(user);
+        List<ModelFriend> friends = new ArrayList<>();
+        when(api.acceptFriend(anyString(), any(RequestAcceptFriend.class))).thenReturn(Observable.just(friends));
+
+        manager.getUser();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.acceptFriend(1, true).subscribe(sub);
+
+        sub.assertNoErrors();
+        verify(api).acceptFriend(anyString(), any(RequestAcceptFriend.class));
+        assertEquals(friends, sub.getOnNextEvents().get(0).getFriends());
+        verify(storage).saveUser(any(ModelUser.class));
+        assertEquals(0, manager.getUser().getFriends().size());
+    }
+
+    @Test
+    public void shouldNotSaveFriendsOnErrorAcceptFriend() {
+        ModelUser user = getUser();
+        when(storage.getUser()).thenReturn(user);
+        Throwable err = new Throwable("");
+        when(api.acceptFriend(anyString(), any(RequestAcceptFriend.class))).thenReturn(Observable.error(err));
+
+        manager.getUser();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.acceptFriend(1, true).subscribe(sub);
+
+        verify(api).acceptFriend(anyString(), any(RequestAcceptFriend.class));
+        sub.assertError(err);
+        verify(storage, never()).saveUser(any(ModelUser.class));
+        assertEquals(user.getFriends().size(), manager.getUser().getFriends().size());
+    }
+
+    @Test
+    public void shouldReturnCachedObservableAcceptFriend() {
+        when(api.acceptFriend(anyString(), any(RequestAcceptFriend.class))).thenReturn(Observable.never());
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.acceptFriend(1, true).subscribe(sub);
+        TestSubscriber<ModelUser> sub2 = new TestSubscriber<>();
+        manager.acceptFriend(1, true).subscribe(sub2);
+
+        verify(api, times(1)).acceptFriend(anyString(), any(RequestAcceptFriend.class));
+    }
+
+    @Test
+    public void shouldReturnFreshObservableAcceptFriend() {
+        when(api.acceptFriend(anyString(), any(RequestAcceptFriend.class))).thenReturn(Observable.never());
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.acceptFriend(1, true).subscribe(sub);
+        TestSubscriber<ModelUser> sub2 = new TestSubscriber<>();
+        manager.acceptFriend(1, false).subscribe(sub2);
+
+        verify(api, times(2)).acceptFriend(anyString(), any(RequestAcceptFriend.class));
+    }
+
+    @Test
+    public void shouldSaveFriendsOnSuccessfulDeleteFriend() {
+        ModelUser user = getUser();
+        when(storage.getUser()).thenReturn(user);
+        List<ModelFriend> friends = new ArrayList<>();
+        when(api.deleteFriend(anyString(), anyLong())).thenReturn(Observable.just(friends));
+
+        manager.getUser();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.deleteFriend(1, true).subscribe(sub);
+
+        sub.assertNoErrors();
+        verify(api).deleteFriend(anyString(), anyLong());
+        assertEquals(friends, sub.getOnNextEvents().get(0).getFriends());
+        verify(storage).saveUser(any(ModelUser.class));
+        assertEquals(0, manager.getUser().getFriends().size());
+    }
+
+    @Test
+    public void shouldNotSaveFriendsOnErrorDeleteFriend() {
+        ModelUser user = getUser();
+        when(storage.getUser()).thenReturn(user);
+        Throwable err = new Throwable("");
+        when(api.deleteFriend(anyString(), anyLong())).thenReturn(Observable.error(err));
+
+        manager.getUser();
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.deleteFriend(1, true).subscribe(sub);
+
+        verify(api).deleteFriend(anyString(), anyLong());
+        sub.assertError(err);
+        verify(storage, never()).saveUser(any(ModelUser.class));
+        assertEquals(user.getFriends().size(), manager.getUser().getFriends().size());
+    }
+
+    @Test
+    public void shouldReturnCachedObservableDeleteFriend() {
+        when(api.deleteFriend(anyString(), anyLong())).thenReturn(Observable.never());
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.deleteFriend(1, true).subscribe(sub);
+        TestSubscriber<ModelUser> sub2 = new TestSubscriber<>();
+        manager.deleteFriend(1, true).subscribe(sub2);
+
+        verify(api, times(1)).deleteFriend(anyString(), anyLong());
+    }
+
+    @Test
+    public void shouldReturnFreshObservableDeleteFriend() {
+        when(api.deleteFriend(anyString(), anyLong())).thenReturn(Observable.never());
+        TestSubscriber<ModelUser> sub = new TestSubscriber<>();
+        manager.deleteFriend(1, true).subscribe(sub);
+        TestSubscriber<ModelUser> sub2 = new TestSubscriber<>();
+        manager.deleteFriend(1, false).subscribe(sub2);
+
+        verify(api, times(2)).deleteFriend(anyString(), anyLong());
     }
 
     public static ModelUser getUser() {

@@ -23,6 +23,7 @@ import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -210,6 +211,118 @@ public class ProfilePresenterTest {
         when(userManager.inviteFriend(anyString(), anyBoolean())).thenReturn(Observable.error(new Throwable()));
 
         presenter.inviteFriend("", false);
+
+        verify(activity).removeDialog();
+        verify(activity, times(1)).setUserData(any(ModelUser.class));
+        verify(activity).showError(anyInt());
+    }
+
+    @Test
+    public void shouldConfirmFriend() {
+        ModelUser user = new ModelUser(1, "name", "pic", "email", new ArrayList<>());
+        when(userManager.getUser()).thenReturn(user);
+        when(userManager.acceptFriend(anyLong(), anyBoolean())).thenReturn(Observable.never());
+        presenter.setParent(activity, null);
+
+        presenter.acceptFriend(1, false);
+
+        verify(userManager).acceptFriend(1, false);
+        verify(activity).showLoadingDialog(R.string.profile_message_accepting);
+    }
+
+    @Test
+    public void shouldCallFriendAcceptWhenFriendAcceptWasCalledBeforeRecreate() {
+        when(userManager.acceptFriend(anyLong(), anyBoolean())).thenReturn(Observable.never());
+        presenter.setParent(activity, null);
+        presenter.acceptFriend(1, false);
+
+        Bundle bundle = mock(Bundle.class);
+        when(bundle.getBoolean(ProfilePresenter.SAVE_ACCEPT, false)).thenReturn(true);
+        presenter.onSaveInstanceState(bundle);
+        presenter.removeParent();
+        presenter.setParent(activity, bundle);
+
+        verify(bundle).getBoolean(ProfilePresenter.SAVE_ACCEPT, false);
+        verify(userManager).acceptFriend(anyLong(), eq(true));
+    }
+
+    @Test
+    public void shouldUpdateUserWhenFriendAcceptIsSuccess() {
+        presenter.setParent(activity, null);
+        ModelUser user = UserManagerTest.getUser();
+        when(userManager.acceptFriend(anyLong(), anyBoolean())).thenReturn(Observable.just(user));
+
+        presenter.acceptFriend(1, false);
+
+        ArgumentCaptor<ModelUser> captor = ArgumentCaptor.forClass(ModelUser.class);
+        verify(activity).removeDialog();
+        verify(activity, times(2)).setUserData(captor.capture());
+        assertEquals(user.getFriends().size(), captor.getValue().getFriends().size());
+    }
+
+    @Test
+    public void shouldShowErrorWhenFriendAcceptFailed() {
+        presenter.setParent(activity, null);
+
+        when(userManager.acceptFriend(anyLong(), anyBoolean())).thenReturn(Observable.error(new Throwable()));
+
+        presenter.acceptFriend(1, false);
+
+        verify(activity).removeDialog();
+        verify(activity, times(1)).setUserData(any(ModelUser.class));
+        verify(activity).showError(anyInt());
+    }
+
+    @Test
+    public void shouldDeleteFriend() {
+        ModelUser user = new ModelUser(1, "name", "pic", "email", new ArrayList<>());
+        when(userManager.getUser()).thenReturn(user);
+        when(userManager.deleteFriend(anyLong(), anyBoolean())).thenReturn(Observable.never());
+        presenter.setParent(activity, null);
+
+        presenter.deleteFriend(1, false);
+
+        verify(userManager).deleteFriend(1, false);
+        verify(activity).showLoadingDialog(R.string.profile_message_deleting);
+    }
+
+    @Test
+    public void shouldCallFriendDeleteWhenFriendAcceptWasCalledBeforeRecreate() {
+        when(userManager.deleteFriend(anyLong(), anyBoolean())).thenReturn(Observable.never());
+        presenter.setParent(activity, null);
+        presenter.deleteFriend(1, false);
+
+        Bundle bundle = mock(Bundle.class);
+        when(bundle.getBoolean(ProfilePresenter.SAVE_DELETE, false)).thenReturn(true);
+        presenter.onSaveInstanceState(bundle);
+        presenter.removeParent();
+        presenter.setParent(activity, bundle);
+
+        verify(bundle).getBoolean(ProfilePresenter.SAVE_DELETE, false);
+        verify(userManager).deleteFriend(anyLong(), eq(true));
+    }
+
+    @Test
+    public void shouldUpdateUserWhenFriendDeleteIsSuccess() {
+        presenter.setParent(activity, null);
+        ModelUser user = UserManagerTest.getUser();
+        when(userManager.deleteFriend(anyLong(), anyBoolean())).thenReturn(Observable.just(user));
+
+        presenter.deleteFriend(1, false);
+
+        ArgumentCaptor<ModelUser> captor = ArgumentCaptor.forClass(ModelUser.class);
+        verify(activity).removeDialog();
+        verify(activity, times(2)).setUserData(captor.capture());
+        assertEquals(user.getFriends().size(), captor.getValue().getFriends().size());
+    }
+
+    @Test
+    public void shouldShowErrorWhenFriendDeleteFailed() {
+        presenter.setParent(activity, null);
+
+        when(userManager.deleteFriend(anyLong(), anyBoolean())).thenReturn(Observable.error(new Throwable()));
+
+        presenter.deleteFriend(1, false);
 
         verify(activity).removeDialog();
         verify(activity, times(1)).setUserData(any(ModelUser.class));

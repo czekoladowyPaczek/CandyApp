@@ -23,6 +23,12 @@
     <string name="profile_error_email_missing">Enter email</string>
     <string name="profile_error_email_exist">User with this email is invited</string>
     <string name="profile_message_inviting">Sending invitation</string>
+    <string name="profile_message_accepting">Accepting invitation</string>
+    <string name="profile_message_deleting">Removing user</string>
+    <string name="profile_delete_message">Do you want to remove selected friend?</string>
+    <string name="profile_accept_message">Do you want to accept or remove invitation?</string>
+    <string name="profile_accept">Accept</string>
+    <string name="profile_delete">Remove</string>
 
     <string name="friend_accepted">Friend</string>
     <string name="friend_waiting">Waiting for user acceptance</string>

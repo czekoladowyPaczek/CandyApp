@@ -1,5 +1,7 @@
 package com.candy.android.candyapp.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.StringDef;
 
 import com.google.gson.annotations.SerializedName;
@@ -11,7 +13,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Marcin
  */
 
-public class ModelFriend {
+public class ModelFriend implements Parcelable {
     @StringDef({STATUS_ACCEPTED, STATUS_INVITED, STATUS_WAITING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface FriendStatus {}
@@ -52,4 +54,38 @@ public class ModelFriend {
     public @FriendStatus String getStatus() {
         return status;
     }
+
+    protected ModelFriend(Parcel in) {
+        id = in.readLong();
+        name = in.readString();
+        picture = in.readString();
+        @FriendStatus String status = in.readString();
+        this.status = status;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(name);
+        dest.writeString(picture);
+        dest.writeString(status);
+    }
+
+    @SuppressWarnings("unused")
+    public static final Parcelable.Creator<ModelFriend> CREATOR = new Parcelable.Creator<ModelFriend>() {
+        @Override
+        public ModelFriend createFromParcel(Parcel in) {
+            return new ModelFriend(in);
+        }
+
+        @Override
+        public ModelFriend[] newArray(int size) {
+            return new ModelFriend[size];
+        }
+    };
 }

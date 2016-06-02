@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.request.RequestAcceptFriend;
 import com.candy.android.candyapp.api.request.RequestInviteFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.model.ModelUserLogin;
@@ -78,6 +79,34 @@ public class UserManager {
     public Observable<ModelUser> inviteFriend(String email, boolean cache) {
         if (!cache || friendInvitationObservable == null) {
             friendInvitationObservable = api.inviteFriend("Bearer " + getToken(), new RequestInviteFriend(email))
+                    .flatMap(friends -> {
+                        ModelUser user = getUser();
+                        user.setFriends(friends);
+                        storage.saveUser(user);
+                        return Observable.just(user);
+                    })
+                    .cache();
+        }
+        return friendInvitationObservable;
+    }
+
+    public Observable<ModelUser> acceptFriend(long id, boolean cache) {
+        if (!cache || friendInvitationObservable == null) {
+            friendInvitationObservable = api.acceptFriend("Bearer " + getToken(), new RequestAcceptFriend(id))
+                    .flatMap(friends -> {
+                        ModelUser user = getUser();
+                        user.setFriends(friends);
+                        storage.saveUser(user);
+                        return Observable.just(user);
+                    })
+                    .cache();
+        }
+        return friendInvitationObservable;
+    }
+
+    public Observable<ModelUser> deleteFriend(long id, boolean cache) {
+        if (!cache || friendInvitationObservable == null) {
+            friendInvitationObservable = api.deleteFriend("Bearer " + getToken(), id)
                     .flatMap(friends -> {
                         ModelUser user = getUser();
                         user.setFriends(friends);
