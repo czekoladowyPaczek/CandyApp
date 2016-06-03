@@ -17,6 +17,7 @@ import com.candy.android.candyapp.view.TextDrawable;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by marcingawel on 02.06.2016.
@@ -53,14 +54,15 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.image)
-        private ImageView image;
+        ImageView image;
         @BindView(R.id.name)
-        private TextView name;
+        TextView name;
         @BindView(R.id.creator)
-        private TextView creator;
+        TextView creator;
 
         public ViewHolder(View itemView) {
             super(itemView);
+            ButterKnife.bind(this, itemView);
         }
 
         public void bind(ModelShop shop, Drawable drawable) {
