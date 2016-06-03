@@ -8,8 +8,8 @@ import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeActivityComponent;
+import com.candy.android.candyapp.graph.FakeManagerModule;
 import com.candy.android.candyapp.graph.FakePresenterModule;
-import com.candy.android.candyapp.graph.FakeUserManagerModule;
 import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.managers.UserManager;
 
@@ -47,7 +47,7 @@ public class ProfileActivityTest {
     public void setup() {
         presenter = mock(ProfilePresenter.class);
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
-                .fakeUserManagerModule(new FakeUserManagerModule(mock(UserManager.class)))
+                .fakeManagerModule(new FakeManagerModule(mock(UserManager.class)))
                 .fakePresenterModule(new FakePresenterModule(presenter))
                 .build();
         ((CandyApplication) RuntimeEnvironment.application).setActivityComponent(component);

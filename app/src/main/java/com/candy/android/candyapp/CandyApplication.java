@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 public class CandyApplication extends Application {
 
+    private static CandyApplication app;
     private ActivityComponent activityComponent;
 
     @Override
@@ -37,6 +38,12 @@ public class CandyApplication extends Application {
         activityComponent = DaggerActivityComponent.builder()
                 .apiModule(new ApiModule(this))
                 .build();
+
+        app = this;
+    }
+
+    public static CandyApplication getApplication() {
+        return app;
     }
 
     public ActivityComponent getActivityComponent() {

@@ -41,7 +41,7 @@ public class LoginFragment extends Fragment {
 
         setRetainInstance(true);
 
-        ((CandyApplication) getActivity().getApplication()).getActivityComponent().inject(this);
+        CandyApplication.getApplication().getActivityComponent().inject(this);
     }
 
     @Nullable

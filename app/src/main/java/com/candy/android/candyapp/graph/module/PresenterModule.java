@@ -2,8 +2,10 @@ package com.candy.android.candyapp.graph.module;
 
 import com.candy.android.candyapp.facebook.FacebookLogin;
 import com.candy.android.candyapp.login.LoginPresenter;
+import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.profile.ProfilePresenter;
+import com.candy.android.candyapp.shop.ShopListPresenter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -21,5 +23,10 @@ public class PresenterModule {
     @Provides
     ProfilePresenter provideProfilePresenter(UserManager manager) {
         return new ProfilePresenter(manager);
+    }
+
+    @Provides
+    ShopListPresenter provideShopListPresenter(ShopManager manager) {
+        return new ShopListPresenter(manager);
     }
 }

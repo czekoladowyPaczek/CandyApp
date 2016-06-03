@@ -68,7 +68,7 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
         public void bind(ModelShop shop, Drawable drawable) {
             image.setImageDrawable(drawable);
             name.setText(shop.getName());
-            creator.setText(shop.getCreator());
+            creator.setText(shop.getOwner().getName());
         }
     }
 }

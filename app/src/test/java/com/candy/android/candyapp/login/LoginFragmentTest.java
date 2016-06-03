@@ -10,7 +10,7 @@ import com.candy.android.candyapp.facebook.FacebookLogin;
 import com.candy.android.candyapp.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeActivityComponent;
 import com.candy.android.candyapp.graph.FakePresenterModule;
-import com.candy.android.candyapp.graph.FakeUserManagerModule;
+import com.candy.android.candyapp.graph.FakeManagerModule;
 import com.candy.android.candyapp.managers.UserManager;
 
 import org.junit.Before;
@@ -55,7 +55,7 @@ public class LoginFragmentTest {
         presenter = spy(new LoginPresenter(facebookLogin, userManager));
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakePresenterModule(new FakePresenterModule(presenter))
-                .fakeUserManagerModule(new FakeUserManagerModule(userManager))
+                .fakeManagerModule(new FakeManagerModule(userManager))
                 .build();
         ((CandyApplication) RuntimeEnvironment.application).setActivityComponent(component);
 

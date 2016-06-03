@@ -1,17 +1,24 @@
 package com.candy.android.candyapp;
 
+import android.app.Instrumentation;
+import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.candy.android.candyapp.graph.component.ActivityComponent;
+import com.candy.android.candyapp.shop.ShopListPresenter;
+import com.candy.android.candyapp.testUtils.graph.DaggerFakeActivityComponent;
+import com.candy.android.candyapp.testUtils.graph.FakePresenterModule;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static junit.framework.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Marcin
@@ -21,11 +28,23 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 public class MainActivityTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> activityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> activityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
+
+    @Before
+    public void setup() {
+        ActivityComponent component = DaggerFakeActivityComponent.builder()
+                .fakePresenterModule(new FakePresenterModule(mock(ShopListPresenter.class)))
+                .build();
+
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        CandyApplication app = (CandyApplication) instrumentation.getTargetContext().getApplicationContext();
+        app.setActivityComponent(component);
+
+        activityTestRule.launchActivity(new Intent());
+    }
 
     @Test
-    public void shouldHaveToolbarAndIcons() {
-        onView(withId(R.id.toolbar)).check(matches(isDisplayed()));
-        onView(withId(R.id.menu_profile)).check(matches(isDisplayed()));
+    public void shouldCreateShopListFragmentOnStart() {
+        assertNotNull(activityTestRule.getActivity().getSupportFragmentManager().findFragmentByTag(MainActivity.TAG_SHOP_LIST));
     }
 }

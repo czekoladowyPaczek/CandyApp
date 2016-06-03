@@ -32,6 +32,7 @@ public class ApiModule {
     @Singleton
     CandyApi provideCandyApi() {
         Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                 .create();
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);

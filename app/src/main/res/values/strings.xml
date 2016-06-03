@@ -35,4 +35,5 @@
     <string name="friend_invited">Accept friend invitation</string>
 
     <string name="shop_no_items">You don\'t have any shopping list. \nCreate new.</string>
+    <string name="shop_dialog_creating">Creating new list</string>
 </resources>

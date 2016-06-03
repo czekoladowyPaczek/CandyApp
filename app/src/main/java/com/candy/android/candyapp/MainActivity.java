@@ -4,37 +4,30 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.candy.android.candyapp.profile.ProfileActivity;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.candy.android.candyapp.shop.ShopListFragment;
 
 /**
  * Created by marcingawel on 29.05.2016.
  */
 
 public class MainActivity extends AppCompatActivity {
-
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    public static final String TAG_SHOP_LIST = "tag_shop_list";
+    private ShopListFragment fragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
 
-        setSupportActionBar(toolbar);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+        if (savedInstanceState == null) {
+            fragment = new ShopListFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, fragment, TAG_SHOP_LIST).commit();
+        } else {
+            fragment = (ShopListFragment) getSupportFragmentManager().findFragmentByTag(TAG_SHOP_LIST);
+        }
     }
 
     @Override
