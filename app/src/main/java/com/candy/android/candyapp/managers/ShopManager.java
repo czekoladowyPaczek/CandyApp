@@ -1,9 +1,10 @@
 package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.model.ModelShop;
-import com.candy.android.zlog.ZLog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
@@ -27,11 +28,18 @@ public class ShopManager {
         if (shops != null && cache) {
             return Observable.just(shops);
         } else {
-            return api.getShopLists(userManager.getToken())
-                    .doOnNext(shops -> {
-                        this.shops = shops;
-                        ZLog.e("onNext");
-                    });
+            return api.getShopLists("Bearer " + userManager.getToken())
+                    .doOnNext(shops -> this.shops = shops);
         }
+    }
+
+    public Observable<ModelShop> createShopList(String name) {
+        return api.createShopList("Bearer " + userManager.getToken(), new RequestCreateShopList(name))
+                .doOnNext(shop -> {
+                    if (shops == null) {
+                        shops = new ArrayList<>();
+                    }
+                    shops.add(shop);
+                });
     }
 }

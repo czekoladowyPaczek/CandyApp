@@ -10,4 +10,8 @@ public class RequestCreateShopList {
     public RequestCreateShopList(String name) {
         this.name = name;
     }
+
+    public String getShopName() {
+        return name;
+    }
 }

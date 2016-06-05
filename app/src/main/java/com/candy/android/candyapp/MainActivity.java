@@ -3,19 +3,22 @@ package com.candy.android.candyapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.profile.ProfileActivity;
+import com.candy.android.candyapp.shop.ShopDetailFragment;
 import com.candy.android.candyapp.shop.ShopListFragment;
 
 /**
  * Created by marcingawel on 29.05.2016.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ShopListFragment.OnShopItemSelected {
     public static final String TAG_SHOP_LIST = "tag_shop_list";
-    private ShopListFragment fragment;
+    public static final String TAG_SHOP_DETAIL = "tag_shop_detail";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -23,10 +26,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {
-            fragment = new ShopListFragment();
+            ShopListFragment fragment = new ShopListFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragment, TAG_SHOP_LIST).commit();
-        } else {
-            fragment = (ShopListFragment) getSupportFragmentManager().findFragmentByTag(TAG_SHOP_LIST);
+        }
+    }
+
+    @Override
+    public void onItemSelected(ModelShop shop) {
+        ShopDetailFragment fragment = new ShopDetailFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, fragment, TAG_SHOP_DETAIL)
+                .addToBackStack(TAG_SHOP_DETAIL)
+                .commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag(TAG_SHOP_LIST);
+        boolean onBackConsumed = false;
+        if (fragment != null && fragment instanceof ShopListFragment) {
+            onBackConsumed = ((ShopListFragment) fragment).onBackPressed();
+        }
+        if (!onBackConsumed) {
+            super.onBackPressed();
         }
     }
 

@@ -25,19 +25,25 @@ import butterknife.ButterKnife;
 
 public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClicked(int position);
+    }
+
     private List<ModelShop> shops;
     private TextDrawable.IBuilder drawableBuilder = TextDrawable.builder().round();
     private ColorGenerator colorGenerator = ColorGenerator.MATERIAL;
     private LayoutInflater inflater;
+    private OnItemClickListener onClick;
 
-    public ShopAdapter(Context context, List<ModelShop> shops) {
+    public ShopAdapter(Context context, List<ModelShop> shops, OnItemClickListener onClick) {
         this.shops = shops;
         inflater = LayoutInflater.from(context);
+        this.onClick = onClick;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.view_list_shop, parent, false));
+        return new ViewHolder(inflater.inflate(R.layout.view_list_shop, parent, false), onClick);
     }
 
     @Override
@@ -60,9 +66,10 @@ public class ShopAdapter extends RecyclerView.Adapter<ShopAdapter.ViewHolder> {
         @BindView(R.id.creator)
         TextView creator;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, OnItemClickListener onClick) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener((v) -> onClick.onItemClicked(getAdapterPosition()));
         }
 
         public void bind(ModelShop shop, Drawable drawable) {

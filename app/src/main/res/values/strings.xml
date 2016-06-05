@@ -5,6 +5,7 @@
     <string name="error_unknown">Some error occurred</string>
     <string name="error_connection">No internet connection</string>
     <string name="error_internal">Internal server error</string>
+    <string name="error_authentication">Authentication error</string>
     <string name="error_no_user">Could not find user</string>
     <string name="error_already_friend">User was already invited</string>
     <string name="error_not_invited">User was not invited</string>
@@ -36,4 +37,8 @@
 
     <string name="shop_no_items">You don\'t have any shopping list. \nCreate new.</string>
     <string name="shop_dialog_creating">Creating new list</string>
+    <string name="shop_error_missing_name">Name is required to create shop list</string>
+    <string name="shop_error_count_limit">You cannot have so many shopping lists</string>
+    <string name="shop_create_shop_title">Create new shopping list</string>
+    <string name="shop_create_shop_name">List name</string>
 </resources>
