@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.api.ModelError;
+import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.model.ModelUser;
 
@@ -25,13 +26,15 @@ public class ProfilePresenter {
     public static final String SAVE_ACCEPT = "com.candy.profile_accept";
     public static final String SAVE_DELETE = "com.candy.profile_delete";
     private UserManager manager;
+    private ShopManager shopManager;
     private ProfileActivity activity;
 
     private Subscription profileSubscription;
     private Subscription friendInvitation;
 
-    public ProfilePresenter(UserManager manager) {
+    public ProfilePresenter(UserManager manager, ShopManager shopManager) {
         this.manager = manager;
+        this.shopManager = shopManager;
     }
 
     public void setParent(@NonNull ProfileActivity activity, @Nullable Bundle savedInstance) {
@@ -94,6 +97,7 @@ public class ProfilePresenter {
 
     public void logout() {
         manager.logout();
+        shopManager.logout();
     }
 
     public void inviteFriend(String email, boolean cache) {

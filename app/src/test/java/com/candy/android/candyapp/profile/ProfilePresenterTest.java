@@ -3,6 +3,7 @@ package com.candy.android.candyapp.profile;
 import android.os.Bundle;
 
 import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.managers.UserManagerTest;
 import com.candy.android.candyapp.model.ModelFriend;
@@ -39,13 +40,15 @@ public class ProfilePresenterTest {
 
     private ProfileActivity activity;
     private UserManager userManager;
+    private ShopManager shopManager;
     private ProfilePresenter presenter;
 
     @Before
     public void setup() {
         activity = mock(ProfileActivity.class);
         userManager = mock(UserManager.class);
-        presenter = new ProfilePresenter(userManager);
+        shopManager = mock(ShopManager.class);
+        presenter = new ProfilePresenter(userManager, shopManager);
     }
 
     @Rule
@@ -82,6 +85,7 @@ public class ProfilePresenterTest {
         presenter.logout();
 
         verify(userManager).logout();
+        verify(shopManager).logout();
     }
 
     @Test

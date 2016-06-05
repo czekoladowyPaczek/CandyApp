@@ -24,6 +24,10 @@ public class ShopManager {
         this.api = api;
     }
 
+    public void logout() {
+        this.shops = null;
+    }
+
     public Observable<List<ModelShop>> getShopLists(boolean cache) {
         if (shops != null && cache) {
             return Observable.just(shops);

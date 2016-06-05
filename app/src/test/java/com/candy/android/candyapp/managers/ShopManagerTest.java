@@ -149,4 +149,16 @@ public class ShopManagerTest {
         assertEquals("shop name", captor.getValue().getShopName());
         verify(api).getShopLists("Bearer " + TOKEN);
     }
+
+    @Test
+    public void shouldClearCacheAfterLogout() {
+        when(userManager.getToken()).thenReturn(TOKEN);
+        when(api.getShopLists(anyString())).thenReturn(Observable.just(new ArrayList<>()));
+
+        manager.getShopLists(true);
+        manager.logout();
+        manager.getShopLists(true);
+
+        verify(api, times(2)).getShopLists(anyString());
+    }
 }

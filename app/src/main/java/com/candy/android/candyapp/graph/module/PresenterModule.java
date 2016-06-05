@@ -21,8 +21,8 @@ public class PresenterModule {
     }
 
     @Provides
-    ProfilePresenter provideProfilePresenter(UserManager manager) {
-        return new ProfilePresenter(manager);
+    ProfilePresenter provideProfilePresenter(UserManager manager, ShopManager shopManager) {
+        return new ProfilePresenter(manager, shopManager);
     }
 
     @Provides
