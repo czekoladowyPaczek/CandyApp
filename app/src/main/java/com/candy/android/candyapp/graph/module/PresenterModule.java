@@ -5,6 +5,7 @@ import com.candy.android.candyapp.login.LoginPresenter;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.profile.ProfilePresenter;
+import com.candy.android.candyapp.shop.ShopDetailPresenter;
 import com.candy.android.candyapp.shop.ShopListPresenter;
 
 import dagger.Module;
@@ -28,5 +29,10 @@ public class PresenterModule {
     @Provides
     ShopListPresenter provideShopListPresenter(ShopManager manager) {
         return new ShopListPresenter(manager);
+    }
+
+    @Provides
+    ShopDetailPresenter shopDetailPresenter(ShopManager manager) {
+        return new ShopDetailPresenter(manager);
     }
 }

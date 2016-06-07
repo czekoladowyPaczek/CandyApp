@@ -130,6 +130,13 @@ public class ShopListFragment extends Fragment {
         root = null;
         toolbar = null;
         presenter.removeParent();
+        refreshLayout = null;
+        emptyView = null;
+        createShopButton = null;
+        container = null;
+        createShopAccept = null;
+        shopNameView = null;
+
         hideLoadingDialog();
         super.onDestroyView();
     }
@@ -142,7 +149,7 @@ public class ShopListFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (container.getVisibility() == View.VISIBLE) {
+        if (container != null && container.getVisibility() == View.VISIBLE) {
             outState.putString(SAVE_NAME, shopNameView.getText().toString());
         }
     }
@@ -197,7 +204,7 @@ public class ShopListFragment extends Fragment {
     }
 
     public boolean onBackPressed() {
-        if (container.getVisibility() == View.VISIBLE) {
+        if (container != null && container.getVisibility() == View.VISIBLE) {
             container.setVisibility(View.GONE);
             createShopButton.setVisibility(View.VISIBLE);
             return true;

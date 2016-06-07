@@ -5,6 +5,7 @@ import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.api.request.RequestInviteFriend;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelShop;
+import com.candy.android.candyapp.model.ModelShopItem;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.model.ModelUserLogin;
 
@@ -43,4 +44,7 @@ public interface  CandyApi {
     Observable<ModelShop> createShopList(@Header("Authorization") String token, @Body RequestCreateShopList body);
     @DELETE("/shop/{id}")
     Observable<ModelResponseSimple> deleteShopList(@Header("Authorization") String token, @Path("id") String id);
+
+    @GET("/shop/{id}")
+    Observable<List<ModelShopItem>> getItems(@Header("Authorization") String token, @Path("id") String id);
 }

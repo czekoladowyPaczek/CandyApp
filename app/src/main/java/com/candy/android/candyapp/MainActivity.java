@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements ShopListFragment.
 
     @Override
     public void onItemSelected(ModelShop shop) {
-        ShopDetailFragment fragment = new ShopDetailFragment();
+        ShopDetailFragment fragment = ShopDetailFragment.getInstance(shop.getId());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, fragment, TAG_SHOP_DETAIL)
                 .addToBackStack(TAG_SHOP_DETAIL)

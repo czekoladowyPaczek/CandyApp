@@ -3,9 +3,12 @@ package com.candy.android.candyapp.managers;
 import com.candy.android.candyapp.api.CandyApi;
 import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.model.ModelShop;
+import com.candy.android.candyapp.model.ModelShopItem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import rx.Observable;
 
@@ -18,14 +21,18 @@ public class ShopManager {
     private CandyApi api;
 
     private List<ModelShop> shops;
+    private Map<String, List<ModelShopItem>> items;
 
     public ShopManager(UserManager userManager, CandyApi api) {
         this.userManager = userManager;
         this.api = api;
+
+        items = new HashMap<>();
     }
 
     public void logout() {
         this.shops = null;
+        this.items.clear();
     }
 
     public Observable<List<ModelShop>> getShopLists(boolean cache) {
@@ -45,5 +52,14 @@ public class ShopManager {
                     }
                     shops.add(shop);
                 });
+    }
+
+    public Observable<List<ModelShopItem>> getShopItems(String id, boolean cache) {
+        if (cache && items.containsKey(id)) {
+            return Observable.just(items.get(id));
+        } else {
+            return api.getItems("Bearer " + userManager.getToken(), id)
+                    .doOnNext(items -> this.items.put(id, items));
+        }
     }
 }

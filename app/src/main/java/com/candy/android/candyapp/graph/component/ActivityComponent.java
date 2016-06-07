@@ -7,6 +7,7 @@ import com.candy.android.candyapp.graph.module.PresenterModule;
 import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.login.LoginFragment;
 import com.candy.android.candyapp.profile.ProfileActivity;
+import com.candy.android.candyapp.shop.ShopDetailFragment;
 import com.candy.android.candyapp.shop.ShopListFragment;
 
 import javax.inject.Singleton;
@@ -23,4 +24,5 @@ public interface ActivityComponent {
     void inject(LoginFragment fragment);
     void inject(ProfileActivity activity);
     void inject(ShopListFragment fragment);
+    void inject(ShopDetailFragment fragment);
 }

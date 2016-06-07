@@ -3,6 +3,8 @@ package com.candy.android.candyapp.managers;
 import com.candy.android.candyapp.api.CandyApi;
 import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.model.ModelShop;
+import com.candy.android.candyapp.model.ModelShopItem;
+import com.candy.android.candyapp.model.ModelShopItemTest;
 import com.candy.android.candyapp.model.ModelShopTest;
 
 import org.junit.Before;
@@ -154,11 +156,50 @@ public class ShopManagerTest {
     public void shouldClearCacheAfterLogout() {
         when(userManager.getToken()).thenReturn(TOKEN);
         when(api.getShopLists(anyString())).thenReturn(Observable.just(new ArrayList<>()));
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(new ArrayList<>()));
 
         manager.getShopLists(true);
+        manager.getShopItems("123", true);
+
         manager.logout();
         manager.getShopLists(true);
+        manager.getShopItems("123", true);
 
-        verify(api, times(2)).getShopLists(anyString());
+        verify(api, times(2)).getShopLists("Bearer " + TOKEN);
+        verify(api, times(2)).getItems(eq("Bearer " + TOKEN), anyString());
+    }
+
+    @Test
+    public void getShopItems_shouldReturnCachedItemsWhenAvailableAndCacheRequested() {
+        List<ModelShopItem> items = new ArrayList<>();
+        items.add(ModelShopItemTest.getModelShopItem());
+        when(userManager.getToken()).thenReturn(TOKEN);
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(items));
+
+        TestSubscriber<List<ModelShopItem>> subOne = new TestSubscriber<>();
+        TestSubscriber<List<ModelShopItem>> subTwo = new TestSubscriber<>();
+        manager.getShopItems("123", true).subscribe(subOne);
+        manager.getShopItems("123", true).subscribe(subTwo);
+
+        subOne.assertNoErrors();
+        subTwo.assertNoErrors();
+        verify(api).getItems("Bearer " + TOKEN, "123");
+    }
+
+    @Test
+    public void getShopItems_shouldReturnNotCachedItemsWhenAvailableButCacheNotRequested() {
+        List<ModelShopItem> items = new ArrayList<>();
+        items.add(ModelShopItemTest.getModelShopItem());
+        when(userManager.getToken()).thenReturn(TOKEN);
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(items));
+
+        TestSubscriber<List<ModelShopItem>> subOne = new TestSubscriber<>();
+        TestSubscriber<List<ModelShopItem>> subTwo = new TestSubscriber<>();
+        manager.getShopItems("123", true).subscribe(subOne);
+        manager.getShopItems("123", false).subscribe(subTwo);
+
+        subOne.assertNoErrors();
+        subTwo.assertNoErrors();
+        verify(api, times(2)).getItems("Bearer " + TOKEN, "123");
     }
 }
