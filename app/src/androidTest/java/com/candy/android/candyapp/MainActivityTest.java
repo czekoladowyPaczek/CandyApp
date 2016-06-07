@@ -9,6 +9,7 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.graph.component.ActivityComponent;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.model.ModelShop;
@@ -63,6 +64,7 @@ public class MainActivityTest {
         when(manager.getShopLists(anyBoolean())).thenReturn(Observable.just(shops));
         List<ModelShopItem> items = new ArrayList<>(1);
         when(manager.getShopItems(anyString(), anyBoolean())).thenReturn(Observable.just(items));
+        when(manager.removeShopList(anyString())).thenReturn(Observable.just(new ModelResponseSimple()));
 
         ActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakePresenterModule(new FakePresenterModule(presenter, detailPresenter))
@@ -99,6 +101,17 @@ public class MainActivityTest {
 
         onView(withId(R.id.shop_detail_list)).check(matches(isDisplayed()));
         pressBack();
+
+        activityTestRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+
+    @Test
+    public void shouldSwitchToDetailFragmentAndRecreateAfterListDeleted() {
+        onView(withId(R.id.shop_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+
+        onView(withId(R.id.shop_detail_list)).check(matches(isDisplayed()));
+        onView(withId(R.id.menu_delete)).perform(click());
+        onView(withId(R.id.shop_list)).check(matches(isDisplayed()));
 
         activityTestRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }

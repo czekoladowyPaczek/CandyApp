@@ -16,7 +16,8 @@ import com.candy.android.candyapp.shop.ShopListFragment;
  * Created by marcingawel on 29.05.2016.
  */
 
-public class MainActivity extends AppCompatActivity implements ShopListFragment.OnShopItemSelected {
+public class MainActivity extends AppCompatActivity implements ShopListFragment.OnShopItemSelected,
+        ShopDetailFragment.OnListDeletedCallback {
     public static final String TAG_SHOP_LIST = "tag_shop_list";
     public static final String TAG_SHOP_DETAIL = "tag_shop_detail";
 
@@ -61,5 +62,10 @@ public class MainActivity extends AppCompatActivity implements ShopListFragment.
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onListDeleted() {
+        getSupportFragmentManager().popBackStack();
     }
 }

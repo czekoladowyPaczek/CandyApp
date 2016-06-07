@@ -39,6 +39,10 @@ import butterknife.ButterKnife;
  */
 
 public class ShopDetailFragment extends Fragment {
+    public interface OnListDeletedCallback {
+        void onListDeleted();
+    }
+
     public static final String LIST_ID = "list_id";
     private View root;
 
@@ -137,6 +141,11 @@ public class ShopDetailFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.shop_detail_menu, menu);
+    }
+
     public void showRemovingDialog() {
         removingDialog = ProgressDialog.show(getContext(), null, getString(R.string.detail_deleting_list), true, false);
         removingDialog.show();
@@ -152,11 +161,6 @@ public class ShopDetailFragment extends Fragment {
                 removingDialog = null;
             }
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.shop_detail_menu, menu);
     }
 
     public void setData(List<ModelShopItem> items) {
@@ -178,5 +182,12 @@ public class ShopDetailFragment extends Fragment {
 
     public void showError(@StringRes int res) {
         Snackbar.make(root, res, Snackbar.LENGTH_LONG).show();
+    }
+
+    public void onListDeleted() {
+        OnListDeletedCallback activity = ((OnListDeletedCallback) getActivity());
+        if (activity != null) {
+            activity.onListDeleted();
+        }
     }
 }
