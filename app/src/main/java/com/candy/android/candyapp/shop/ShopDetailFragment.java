@@ -47,7 +47,7 @@ public class ShopDetailFragment extends Fragment {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-    @BindView(R.id.shop_list)
+    @BindView(R.id.shop_detail_list)
     RecyclerView shopList;
     @BindView(R.id.refreshLayout)
     SwipeRefreshLayout refreshLayout;
