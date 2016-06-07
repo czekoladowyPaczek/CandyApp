@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
@@ -201,5 +202,44 @@ public class ShopManagerTest {
         subOne.assertNoErrors();
         subTwo.assertNoErrors();
         verify(api, times(2)).getItems("Bearer " + TOKEN, "123");
+    }
+
+    @Test
+    public void removeShopList_shouldCallApi() {
+        when(api.deleteShopList(anyString(), anyString())).thenReturn(Observable.just(new ModelResponseSimple()));
+        TestSubscriber<ModelResponseSimple> sub = new TestSubscriber<>();
+
+        manager.removeShopList("123").subscribe(sub);
+
+        verify(api).deleteShopList("Bearer " + TOKEN, "123");
+        sub.assertNoErrors();
+    }
+
+    @Test
+    public void removeShopList_shouldCallApiAndRemoveFromCacheIfAvailable() {
+        List<ModelShop> shops = new ArrayList<>();
+        shops.add(ModelShopTest.getModelShop());
+        shops.add(new ModelShop("123", null, null, "name", null));
+        List<ModelShopItem> items = new ArrayList<>(1);
+        items.add(ModelShopItemTest.getModelShopItem());
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(items));
+        when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
+        when(api.deleteShopList(anyString(), anyString())).thenReturn(Observable.just(new ModelResponseSimple()));
+        TestSubscriber<ModelResponseSimple> sub = new TestSubscriber<>();
+        TestSubscriber<List<ModelShop>> shopSub = new TestSubscriber<>();
+        TestSubscriber<List<ModelShopItem>> itemSub = new TestSubscriber<>();
+
+        manager.getShopItems("123", false).subscribe(new TestSubscriber<>());
+        manager.getShopLists(false).subscribe(new TestSubscriber<>());
+        manager.removeShopList("123").subscribe(sub);
+        manager.getShopItems("123", true).subscribe(itemSub);
+        manager.getShopLists(true).subscribe(shopSub);
+
+
+        verify(api).deleteShopList("Bearer " + TOKEN, "123");
+        sub.assertNoErrors();
+        verify(api, times(2)).getItems(anyString(), eq("123"));
+        verify(api, times(1)).getShopLists(anyString());
+        assertEquals(1, shopSub.getOnNextEvents().get(0).size());
     }
 }

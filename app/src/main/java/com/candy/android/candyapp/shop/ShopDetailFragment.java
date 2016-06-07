@@ -1,5 +1,7 @@
 package com.candy.android.candyapp.shop;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -12,6 +14,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +59,8 @@ public class ShopDetailFragment extends Fragment {
 
     private ShopItemsAdapter adapter;
     private List<ModelShopItem> items;
+
+    private Dialog removingDialog;
 
     public static ShopDetailFragment getInstance(ModelShop shop) {
         Bundle args = new Bundle(1);
@@ -112,6 +118,7 @@ public class ShopDetailFragment extends Fragment {
         emptyView = null;
         createShopButton = null;
         presenter.removeParent();
+        hideRemovingDialog();
         super.onDestroyView();
     }
 
@@ -121,9 +128,35 @@ public class ShopDetailFragment extends Fragment {
             case android.R.id.home:
                 getActivity().onBackPressed();
                 return true;
+            case R.id.menu_delete:
+                presenter.deleteList();
+                showRemovingDialog();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void showRemovingDialog() {
+        removingDialog = ProgressDialog.show(getContext(), null, getString(R.string.detail_deleting_list), true, false);
+        removingDialog.show();
+    }
+
+    public void hideRemovingDialog() {
+        if (removingDialog != null) {
+            try {
+                removingDialog.dismiss();
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+            } finally {
+                removingDialog = null;
+            }
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.shop_detail_menu, menu);
     }
 
     public void setData(List<ModelShopItem> items) {

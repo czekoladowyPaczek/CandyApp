@@ -45,6 +45,14 @@ public class ModelShop implements Parcelable {
 
     }
 
+    public ModelShop(String id, ModelShopUser owner, List<ModelShopUser> users, String name, Date modificationDate) {
+        this.id = id;
+        this.owner = owner;
+        this.users = users;
+        this.name = name;
+        this.modificationDate = modificationDate;
+    }
+
     protected ModelShop(Parcel in) {
         id = in.readString();
         owner = (ModelShopUser) in.readValue(ModelShopUser.class.getClassLoader());

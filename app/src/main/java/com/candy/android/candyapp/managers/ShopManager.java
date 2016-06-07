@@ -1,12 +1,14 @@
 package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +42,10 @@ public class ShopManager {
             return Observable.just(shops);
         } else {
             return api.getShopLists("Bearer " + userManager.getToken())
-                    .doOnNext(shops -> this.shops = shops);
+                    .doOnNext(shops -> {
+                        this.shops = shops;
+                        System.out.println("cached");
+                    });
         }
     }
 
@@ -51,6 +56,26 @@ public class ShopManager {
                         shops = new ArrayList<>();
                     }
                     shops.add(shop);
+                });
+    }
+
+    public Observable<ModelResponseSimple> removeShopList(String id) {
+        return api.deleteShopList("Bearer " + userManager.getToken(), id)
+                .doOnNext(response -> {
+                    if (shops != null) {
+                        System.out.println("not null");
+                        Iterator<ModelShop> shopIterator = shops.iterator();
+                        while (shopIterator.hasNext()) {
+                            final ModelShop shop = shopIterator.next();
+                            if (shop.getId().equals(id)) {
+                                shopIterator.remove();
+                                break;
+                            }
+                        }
+                    }
+                    if (items.containsKey(id)) {
+                        items.remove(id);
+                    }
                 });
     }
 

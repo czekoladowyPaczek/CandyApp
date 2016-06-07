@@ -65,4 +65,8 @@ public class ShopDetailPresenter {
             getItemsObs = null;
         });
     }
+
+    public void deleteList() {
+
+    }
 }

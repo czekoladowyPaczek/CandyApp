@@ -1,5 +1,6 @@
 package com.candy.android.candyapp.shop;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowAlertDialog;
+import org.robolectric.shadows.ShadowProgressDialog;
 import org.robolectric.shadows.support.v4.ShadowSwipeRefreshLayout;
 import org.robolectric.shadows.support.v4.SupportFragmentTestUtil;
 
@@ -116,5 +119,15 @@ public class ShopDetailFragmentTest {
         assertTrue(layout.isRefreshing());
         fragment.showListLoading(false);
         assertFalse(layout.isRefreshing());
+    }
+
+    @Test
+    public void shouldShowDialogAndRemoveList() {
+        fragment.getView().findViewById(R.id.menu_delete).performClick();
+
+        AlertDialog dialog = ShadowProgressDialog.getLatestAlertDialog();
+        ShadowAlertDialog shadow = shadowOf(dialog);
+        assertEquals(RuntimeEnvironment.application.getString(R.string.detail_deleting_list), shadow.getMessage());
+        verify(presenter).deleteList();
     }
 }
