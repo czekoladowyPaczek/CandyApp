@@ -69,6 +69,7 @@ public class ShopListFragment extends Fragment {
     EditText shopNameView;
 
     private ShopAdapter adapter;
+    private LinearLayoutManager layoutManager;
     private List<ModelShop> shops;
 
     @Inject
@@ -101,7 +102,8 @@ public class ShopListFragment extends Fragment {
         shops = new ArrayList<>();
         adapter = new ShopAdapter(getContext(), shops,
                 position -> ((OnShopItemSelected) getActivity()).onItemSelected(shops.get(position)));
-        shopList.setLayoutManager(new LinearLayoutManager(getContext()));
+        layoutManager = new LinearLayoutManager(getContext());
+        shopList.setLayoutManager(layoutManager);
         shopList.setAdapter(adapter);
         refreshLayout.setOnRefreshListener(() -> presenter.getShopLists(false));
         createShopButton.setOnClickListener(v -> createShoppingList(true));
@@ -136,6 +138,7 @@ public class ShopListFragment extends Fragment {
         container = null;
         createShopAccept = null;
         shopNameView = null;
+        layoutManager = null;
 
         hideLoadingDialog();
         super.onDestroyView();
@@ -195,6 +198,10 @@ public class ShopListFragment extends Fragment {
     public void addData(ModelShop shop) {
         this.shops.add(0, shop);
         adapter.notifyItemInserted(0);
+
+        if (layoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
+            layoutManager.scrollToPosition(0);
+        }
 
         changeEmptyViewVisibility();
     }
