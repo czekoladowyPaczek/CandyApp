@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
 import com.candy.android.candyapp.shop.adapter.ShopItemsAdapter;
 
@@ -55,9 +56,9 @@ public class ShopDetailFragment extends Fragment {
     private ShopItemsAdapter adapter;
     private List<ModelShopItem> items;
 
-    public static ShopDetailFragment getInstance(String shopId) {
+    public static ShopDetailFragment getInstance(ModelShop shop) {
         Bundle args = new Bundle(1);
-        args.putString(LIST_ID, shopId);
+        args.putParcelable(LIST_ID, shop);
         ShopDetailFragment fragment = new ShopDetailFragment();
         fragment.setArguments(args);
         return fragment;
@@ -84,9 +85,11 @@ public class ShopDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, root);
 
+        ModelShop shop = getArguments().getParcelable(LIST_ID);
+
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
-        activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        activity.getSupportActionBar().setTitle(shop.getName());
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         activity.getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -96,7 +99,7 @@ public class ShopDetailFragment extends Fragment {
         shopList.setAdapter(adapter);
         refreshLayout.setOnRefreshListener(() -> presenter.getShopListItems(false));
 
-        presenter.setParent(getArguments().getString(LIST_ID, ""), this);
+        presenter.setParent(shop.getId(), this);
     }
 
     @Override

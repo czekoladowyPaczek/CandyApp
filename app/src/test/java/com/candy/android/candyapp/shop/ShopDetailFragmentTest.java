@@ -15,6 +15,7 @@ import com.candy.android.candyapp.graph.FakePresenterModule;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.model.ModelShopItem;
 import com.candy.android.candyapp.model.ModelShopItemTest;
+import com.candy.android.candyapp.model.ModelShopTest;
 import com.candy.android.candyapp.testUtils.DummyActivity;
 
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class ShopDetailFragmentTest {
 
         fragment = new ShopDetailFragment();
         Bundle bundle = new Bundle(1);
-        bundle.putString(ShopDetailFragment.LIST_ID, ID);
+        bundle.putParcelable(ShopDetailFragment.LIST_ID, ModelShopTest.getModelShop());
         fragment.setArguments(bundle);
         SupportFragmentTestUtil.startVisibleFragment(fragment, DummyActivity.class, R.id.container);
     }
@@ -68,7 +69,7 @@ public class ShopDetailFragmentTest {
         fragment.onDestroyView();
 
         assertTrue(fragment.getRetainInstance());
-        verify(presenter).setParent(ID, fragment);
+        verify(presenter).setParent(ModelShopTest.getModelShop().getId(), fragment);
         verify(presenter).removeParent();
     }
 
