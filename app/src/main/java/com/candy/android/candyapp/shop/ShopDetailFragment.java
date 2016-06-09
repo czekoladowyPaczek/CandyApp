@@ -177,7 +177,7 @@ public class ShopDetailFragment extends Fragment {
     }
 
     public void showListLoading(boolean refreshing) {
-        refreshLayout.setRefreshing(refreshing);
+        refreshLayout.post(() -> refreshLayout.setRefreshing(refreshing));
     }
 
     public void showError(@StringRes int res) {

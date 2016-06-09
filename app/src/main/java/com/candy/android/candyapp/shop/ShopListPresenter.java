@@ -21,6 +21,7 @@ import rx.schedulers.Schedulers;
 public class ShopListPresenter {
     private ShopManager manager;
     private ShopListFragment parent;
+    private boolean freshStart = true;
 
     private Subscription shopsSubscription;
     private Observable<List<ModelShop>> shopsObservable;
@@ -35,11 +36,13 @@ public class ShopListPresenter {
     public void setParent(ShopListFragment parent) {
         this.parent = parent;
 
-        if (shopsObservable != null) {
+        if (freshStart || shopsObservable != null) {
+            freshStart = false;
             parent.showListLoading(true);
+        }
+        if (shopsObservable != null) {
             shopsSubscription = subscribeToShops(shopsObservable);
         } else {
-            parent.showListLoading(true);
             getShopLists(true);
         }
         if (shopCreateObservable != null) {

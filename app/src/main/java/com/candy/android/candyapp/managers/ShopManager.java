@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.managers;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.model.ModelShop;
@@ -42,10 +43,7 @@ public class ShopManager {
             return Observable.just(shops);
         } else {
             return api.getShopLists("Bearer " + userManager.getToken())
-                    .doOnNext(shops -> {
-                        this.shops = shops;
-                        System.out.println("cached");
-                    });
+                    .doOnNext(shops -> this.shops = shops);
         }
     }
 
@@ -61,22 +59,28 @@ public class ShopManager {
 
     public Observable<ModelResponseSimple> removeShopList(String id) {
         return api.deleteShopList("Bearer " + userManager.getToken(), id)
-                .doOnNext(response -> {
-                    if (shops != null) {
-                        System.out.println("not null");
-                        Iterator<ModelShop> shopIterator = shops.iterator();
-                        while (shopIterator.hasNext()) {
-                            final ModelShop shop = shopIterator.next();
-                            if (shop.getId().equals(id)) {
-                                shopIterator.remove();
-                                break;
-                            }
-                        }
-                    }
-                    if (items.containsKey(id)) {
-                        items.remove(id);
+                .doOnNext(response -> removeShopFromCache(id))
+                .doOnError(error -> {
+                    if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST) {
+                        removeShopFromCache(id);
                     }
                 });
+    }
+
+    private void removeShopFromCache(String shopId) {
+        if (shops != null) {
+            Iterator<ModelShop> shopIterator = shops.iterator();
+            while (shopIterator.hasNext()) {
+                final ModelShop shop = shopIterator.next();
+                if (shop.getId().equals(shopId)) {
+                    shopIterator.remove();
+                    break;
+                }
+            }
+        }
+        if (items.containsKey(shopId)) {
+            items.remove(shopId);
+        }
     }
 
     public Observable<List<ModelShopItem>> getShopItems(String id, boolean cache) {

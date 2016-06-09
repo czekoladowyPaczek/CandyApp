@@ -1,5 +1,7 @@
 package com.candy.android.candyapp.shop;
 
+import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.model.ModelShopItem;
@@ -16,7 +18,7 @@ import rx.schedulers.Schedulers;
  */
 
 public class ShopDetailPresenter {
-
+    private boolean freshStart = true;
     private ShopManager shopManager;
     private String listId;
     private ShopDetailFragment fragment;
@@ -35,7 +37,11 @@ public class ShopDetailPresenter {
         this.listId = listId;
         this.fragment = fragment;
 
-        fragment.showListLoading(true);
+        if (freshStart || getItemsObs != null) {
+            freshStart = false;
+            fragment.showListLoading(true);
+        }
+
         if (getItemsObs != null) {
             getItemsSub = subscribeToGetItems(getItemsObs);
         } else {
@@ -92,7 +98,19 @@ public class ShopDetailPresenter {
             removeListObs = null;
         }, error -> {
             fragment.hideRemovingDialog();
-            fragment.showError(0); // TODO:
+            switch (ModelError.fromRetrofit(error).getCode()) {
+                case ModelError.INTERNET_CONNECTION:
+                    fragment.showError(R.string.error_connection);
+                    break;
+                case ModelError.LIST_NOT_EXIST:
+                    fragment.showError(R.string.shop_error_list_not_exist);
+                    break;
+                case ModelError.NOT_PERMITTED:
+                    fragment.showError(R.string.error_not_permitted);
+                    break;
+                default:
+                    fragment.showError(R.string.error_unknown);
+            }
             removeListObs = null;
         });
     }
