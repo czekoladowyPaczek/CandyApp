@@ -208,6 +208,22 @@ public class ShopManagerTest {
     }
 
     @Test
+    public void getShopItems_shouldRemoveShoppingListFromCacheIfItDoesNotExistOnServer() {
+        List<ModelShop> shops = new ArrayList<>();
+        shops.add(ModelShopTest.getModelShop());
+        when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.error(getRetrofitException(32)));
+
+        TestSubscriber<List<ModelShop>> sub = new TestSubscriber<>();
+        manager.getShopLists(true).subscribe(new TestSubscriber<>());
+        manager.getShopItems(ModelShopTest.getModelShop().getId(), true).subscribe(new TestSubscriber<>());
+        manager.getShopLists(true).subscribe(sub);
+
+        sub.assertNoErrors();
+        assertEquals(0, sub.getOnNextEvents().get(0).size());
+    }
+
+    @Test
     public void removeShopList_shouldCallApiAndRemoveFromCacheIfAvailable() {
         List<ModelShop> shops = new ArrayList<>();
         shops.add(ModelShopTest.getModelShop());
@@ -244,7 +260,7 @@ public class ShopManagerTest {
         items.add(ModelShopItemTest.getModelShopItem());
         when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(items));
         when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
-        HttpException e = new HttpException(Response.error(500, ResponseBody.create(null, "{\"code\": 32, \"message\":\"Error\"}")));
+        HttpException e = getRetrofitException(32);
         when(api.deleteShopList(anyString(), anyString())).thenReturn(Observable.error(e));
         TestSubscriber<ModelResponseSimple> sub = new TestSubscriber<>();
         TestSubscriber<List<ModelShop>> shopSub = new TestSubscriber<>();
@@ -273,7 +289,7 @@ public class ShopManagerTest {
         items.add(ModelShopItemTest.getModelShopItem());
         when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(items));
         when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
-        HttpException e = new HttpException(Response.error(500, ResponseBody.create(null, "{\"code\": 33, \"message\":\"Error\"}")));
+        HttpException e = getRetrofitException(33);
         when(api.deleteShopList(anyString(), anyString())).thenReturn(Observable.error(e));
         TestSubscriber<ModelResponseSimple> sub = new TestSubscriber<>();
         TestSubscriber<List<ModelShop>> shopSub = new TestSubscriber<>();
@@ -291,5 +307,9 @@ public class ShopManagerTest {
         verify(api, times(1)).getItems(anyString(), eq("123"));
         verify(api, times(1)).getShopLists(anyString());
         assertEquals(2, shopSub.getOnNextEvents().get(0).size());
+    }
+
+    private HttpException getRetrofitException(int code) {
+        return new HttpException(Response.error(500, ResponseBody.create(null, "{\"code\": " + code + ", \"message\":\"Error\"}")));
     }
 }

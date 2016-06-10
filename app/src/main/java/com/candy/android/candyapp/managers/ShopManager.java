@@ -67,6 +67,20 @@ public class ShopManager {
                 });
     }
 
+    public Observable<List<ModelShopItem>> getShopItems(String id, boolean cache) {
+        if (cache && items.containsKey(id)) {
+            return Observable.just(items.get(id));
+        } else {
+            return api.getItems("Bearer " + userManager.getToken(), id)
+                    .doOnNext(items -> this.items.put(id, items))
+                    .doOnError(error -> {
+                        if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST) {
+                            removeShopFromCache(id);
+                        }
+                    });
+        }
+    }
+
     private void removeShopFromCache(String shopId) {
         if (shops != null) {
             Iterator<ModelShop> shopIterator = shops.iterator();
@@ -80,15 +94,6 @@ public class ShopManager {
         }
         if (items.containsKey(shopId)) {
             items.remove(shopId);
-        }
-    }
-
-    public Observable<List<ModelShopItem>> getShopItems(String id, boolean cache) {
-        if (cache && items.containsKey(id)) {
-            return Observable.just(items.get(id));
-        } else {
-            return api.getItems("Bearer " + userManager.getToken(), id)
-                    .doOnNext(items -> this.items.put(id, items));
         }
     }
 }
