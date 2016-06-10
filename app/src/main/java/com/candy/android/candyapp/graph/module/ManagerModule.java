@@ -5,6 +5,8 @@ import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.storage.UserStorage;
 
+import javax.inject.Singleton;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -15,11 +17,13 @@ import dagger.Provides;
 @Module
 public class ManagerModule {
     @Provides
+    @Singleton
     public UserManager provideUserManager(CandyApi api, UserStorage storage) {
         return new UserManager(api, storage);
     }
 
     @Provides
+    @Singleton
     public ShopManager provideShopManager(CandyApi api, UserManager manager) {
         return new ShopManager(manager, api);
     }
