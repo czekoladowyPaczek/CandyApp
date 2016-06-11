@@ -1,68 +1,94 @@
 package com.candy.android.candyapp.api;
 
-import com.google.gson.Gson;
+import android.support.annotation.StringRes;
+
+import com.candy.android.candyapp.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.adapter.rxjava.HttpException;
 
 /**
  * @author Marcin
  */
 
-public class ModelError {
-    public static final int INTERNET_CONNECTION = -1;
-    public static final int AUTHENTICATION = 1000;
-    public static final int UNKNOWN = 0;
-    public static final int MISSING_PROPERTIES = 1;
-    public static final int MISSING_EMAIL = 2;
-    public static final int INCORRECT_TOKEN = 3;
-    public static final int INCORRECT_EMAIL = 4;
-    public static final int EMAIL_ALREADY_EXISTS = 5;
-    public static final int NO_USER = 6;
-    public static final int SELF_INVITATION = 21;
-    public static final int ALREADY_FRIEND = 22;
-    public static final int NOT_INVITED = 23;
-    public static final int LIST_COUNT_LIMIT_EXCEEDED = 31;
-    public static final int LIST_NOT_EXIST = 32;
-    public static final int NOT_PERMITTED = 33;
-    public static final int CANNOT_INVITE_SELF = 41;
-    public static final int CANNOT_REMOVE_OWNER = 42;
-    public static final int USER_IS_NOT_INVITED = 43;
-    public static final int ALREADY_INVITED = 44;
-    public static final int NOT_ON_FRIEND_LIST = 45;
-    public static final int CANNOT_REMOVE_SELF = 46;
-    public static final int LIST_SIZE_LIMIT_EXCEEDED = 47;
-    public static final int SHOP_ITEM_NOT_CHANGED = 51;
-    public static final int SHOP_ITEM_NOT_EXIST = 52;
+public enum ModelError {
+    INTERNET_CONNECTION(-1, R.string.error_connection),
+    AUTHENTICATION(1000, R.string.error_authentication),
+    UNKNOWN(0, R.string.error_unknown),
+    MISSING_PROPERTIES(1, R.string.error_internal),
+    MISSING_EMAIL(2, R.string.error_missing_email),
+    INCORRECT_TOKEN(3, R.string.error_token),
+    INCORRECT_EMAIL(4, R.string.error_incorrect_email),
+    EMAIL_ALREADY_EXISTS(5, R.string.error_existing_email),
+    NO_USER(6, R.string.error_no_user),
+
+    SELF_INVITATION(21, R.string.error_cannot_invite_self),
+    ALREADY_FRIEND(22, R.string.error_already_friend),
+    NOT_INVITED(23, R.string.error_not_invited),
+
+    LIST_COUNT_LIMIT_EXCEEDED(31, R.string.error_list_count_limit),
+    LIST_NOT_EXIST(32, R.string.error_list_not_exist),
+    NOT_PERMITTED(33, R.string.error_not_permitted),
+
+    CANNOT_INVITE_SELF(41, R.string.error_cannot_invite_self),
+    CANNOT_REMOVE_OWNER(42, R.string.error_owner_remove),
+    USER_IS_NOT_INVITED(43, R.string.error_remove_uninvited),
+    ALREADY_INVITED(44, R.string.error_already_friend),
+    NOT_ON_FRIEND_LIST(45, R.string.error_invite_not_friend),
+    CANNOT_REMOVE_SELF(46, R.string.error_remove_self),
+    LIST_SIZE_LIMIT_EXCEEDED(47, R.string.error_item_count_limit),
+
+    SHOP_ITEM_NOT_CHANGED(51, R.string.error_item_not_changed),
+    SHOP_ITEM_NOT_EXIST(52, R.string.error_item_deleted);
 
     private int code;
+    private @StringRes int resource;
 
-    private ModelError(int code) {
+    ModelError(int code, int resource) {
         this.code = code;
+        this.resource = resource;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public @StringRes int getResourceMessage() {
+        return resource;
     }
 
     public static ModelError fromRetrofit(Throwable exception) {
         if (exception instanceof HttpException) {
             HttpException e = (HttpException) exception;
             if (e.code() == 401) {
-                return new ModelError(AUTHENTICATION);
+                return ModelError.AUTHENTICATION;
             } else if (e.code() == 500) {
-                Gson gson = new Gson();
                 try {
-                    return gson.fromJson(e.response().errorBody().string(), ModelError.class);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    return new ModelError(UNKNOWN);
+                    JSONObject obj = new JSONObject(e.response().errorBody().string());
+                    int code = obj.getInt("code");
+                    for (ModelError error : ModelError.values()) {
+                        if (error.getCode() == code) {
+                            return error;
+                        }
+                    }
+                } catch (IOException | JSONException ex) {
+                    e.printStackTrace();
                 }
-            } else {
-                return new ModelError(UNKNOWN);
             }
         } else {
-            return new ModelError(INTERNET_CONNECTION);
+            return ModelError.INTERNET_CONNECTION;
         }
+
+        return ModelError.UNKNOWN;
     }
-    public int getCode() {
-        return code;
+
+    public static HttpException generateError(ModelError code) {
+        return new HttpException(Response.error(500, ResponseBody.create(null, "{\"code\":" + code.getCode() + ", \"message\":\"\"}")));
     }
 }

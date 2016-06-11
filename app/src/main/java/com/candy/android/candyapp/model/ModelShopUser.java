@@ -25,7 +25,13 @@ public class ModelShopUser implements Parcelable {
     }
 
     public ModelShopUser() {
+        this(1, "name", "");
+    }
 
+    public ModelShopUser(long id, String name, String picture) {
+        this.id = id;
+        this.name = name;
+        this.picture = picture;
     }
 
     protected ModelShopUser(Parcel in) {

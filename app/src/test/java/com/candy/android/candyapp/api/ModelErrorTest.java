@@ -1,6 +1,13 @@
 package com.candy.android.candyapp.api;
 
+import com.candy.android.candyapp.BuildConfig;
+
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
+
+import java.io.IOException;
 
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -11,36 +18,39 @@ import static junit.framework.Assert.assertEquals;
 /**
  * @author Marcin
  */
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
 public class ModelErrorTest {
     @Test
-    public void shouldBuildInternetConnectionError() throws Exception {
-        Throwable th = new Throwable("");
+    public void fromRetrofit_shouldCreateInternetConnectionError() {
+        Throwable th = new Throwable();
 
-        ModelError err = ModelError.fromRetrofit(th);
-        assertEquals(ModelError.INTERNET_CONNECTION, err.getCode());
+        assertEquals(ModelError.INTERNET_CONNECTION, ModelError.fromRetrofit(th));
     }
 
     @Test
-    public void shouldBuildAuthenticationError() throws Exception {
-        HttpException ex = new HttpException(Response.error(401, ResponseBody.create(null, "")));
+    public void fromRetrofit_shouldCreateAuthenticationError() {
+        Throwable th = new HttpException(Response.error(401, ResponseBody.create(null, "")));
 
-        ModelError err = ModelError.fromRetrofit(ex);
-        assertEquals(ModelError.AUTHENTICATION, err.getCode());
+        assertEquals(ModelError.AUTHENTICATION, ModelError.fromRetrofit(th));
     }
 
     @Test
-    public void shouldBuildSpecificError() throws Exception {
-        HttpException ex = new HttpException(Response.error(500, ResponseBody.create(null, "{\"code\":1}")));
+    public void fromRetrofit_shouldCreateSpecificError() {
+        Throwable th = new HttpException(Response.error(500, ResponseBody.create(null, "{\"code\":22, \"message\":\"test message\"}")));
 
-        ModelError err = ModelError.fromRetrofit(ex);
-        assertEquals(ModelError.MISSING_PROPERTIES, err.getCode());
+        assertEquals(ModelError.ALREADY_FRIEND, ModelError.fromRetrofit(th));
     }
 
     @Test
-    public void shouldBuildUnknownError() throws Exception {
-        HttpException ex = new HttpException(Response.error(501, ResponseBody.create(null, "{\"code\":1}")));
+    public void fromRetrofit_shouldCreateUnknownErrorWhenCodeOtherThan500() {
+        Throwable th = new HttpException(Response.error(501, ResponseBody.create(null, "{\"code\":22, \"message\":\"test message\"}")));
 
-        ModelError err = ModelError.fromRetrofit(ex);
-        assertEquals(ModelError.UNKNOWN, err.getCode());
+        assertEquals(ModelError.UNKNOWN, ModelError.fromRetrofit(th));
+    }
+
+    @Test
+    public void generateError() throws IOException {
+        assertEquals("{\"code\":22, \"message\":\"\"}", ModelError.generateError(ModelError.ALREADY_FRIEND).response().errorBody().string());
     }
 }

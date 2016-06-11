@@ -2,13 +2,32 @@
     <string name="app_name">Candy App</string>
     <string name="facebook_id" translatable="false">1683017735281219</string>
 
-    <string name="error_unknown">Some error occurred</string>
     <string name="error_connection">No internet connection</string>
-    <string name="error_internal">Internal server error</string>
     <string name="error_authentication">Authentication error</string>
+    <string name="error_unknown">Some error occurred</string>
+    <string name="error_internal">Internal server error</string>
+    <string name="error_missing_email">Email is required to create account</string>
+    <string name="error_token">Incorrect Facebook token</string>
+    <string name="error_incorrect_email">Incorrect email</string>
+    <string name="error_existing_email">Account with this email already exist</string>
     <string name="error_no_user">Could not find user</string>
+
+    <string name="error_cannot_invite_self">You cannot invite yourself</string>
     <string name="error_already_friend">User was already invited</string>
     <string name="error_not_invited">User was not invited</string>
+
+    <string name="error_list_count_limit">You cannot have so many shopping lists</string>
+    <string name="error_list_not_exist">Selected list doesn\'t exist or you are not permitted</string>
+    <string name="error_not_permitted">This operation is not permitted</string>
+
+    <string name="error_owner_remove">List owner cannot be removed</string>
+    <string name="error_remove_uninvited">You don\'t share list with list</string>
+    <string name="error_invite_not_friend">You can share list only with your friends</string>
+    <string name="error_remove_self">You cannot remove yourself</string>
+    <string name="error_item_count_limit">You cannot have so many shopping lists</string>
+
+    <string name="error_item_not_changed">Changes were not saved</string>
+    <string name="error_item_deleted">This item doesn\'t exist</string>
 
     <string name="login_welcome">Create shopping lists and share it with you friends</string>
     <string name="login_facebook">Sign in with Facebook</string>
