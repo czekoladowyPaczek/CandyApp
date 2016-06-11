@@ -55,7 +55,7 @@ public class ShopManager {
                     if (shops == null) {
                         shops = new ArrayList<>();
                     }
-                    shops.add(shop);
+                    shops.add(0, shop);
                 });
     }
 
