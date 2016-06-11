@@ -84,7 +84,7 @@ public class ShopDetailFragmentTest {
 
         fragment.setData(shops);
 
-        RecyclerView list = (RecyclerView) fragment.getView().findViewById(R.id.shop_list);
+        RecyclerView list = (RecyclerView) fragment.getView().findViewById(R.id.shop_detail_list);
         assertEquals(View.GONE, fragment.getView().findViewById(R.id.empty_layout).getVisibility());
         assertEquals(2, list.getAdapter().getItemCount());
     }
@@ -97,7 +97,7 @@ public class ShopDetailFragmentTest {
         fragment.setData(shops);
         fragment.setData(new ArrayList<>());
 
-        RecyclerView list = (RecyclerView) fragment.getView().findViewById(R.id.shop_list);
+        RecyclerView list = (RecyclerView) fragment.getView().findViewById(R.id.shop_detail_list);
         assertEquals(View.VISIBLE, fragment.getView().findViewById(R.id.empty_layout).getVisibility());
         assertEquals(0, list.getAdapter().getItemCount());
     }
