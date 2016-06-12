@@ -3,6 +3,7 @@ package com.candy.android.candyapp.graph;
 import com.candy.android.candyapp.login.LoginPresenter;
 import com.candy.android.candyapp.profile.ProfilePresenter;
 import com.candy.android.candyapp.shop.ShopDetailPresenter;
+import com.candy.android.candyapp.shop.ShopFriendPresenter;
 import com.candy.android.candyapp.shop.ShopListPresenter;
 
 import dagger.Module;
@@ -20,52 +21,62 @@ public class FakePresenterModule {
     private ProfilePresenter profilePresenter;
     private ShopListPresenter shopListPresenter;
     private ShopDetailPresenter shopDetailPresenter;
+    private ShopFriendPresenter shopFriendPresenter;
 
-    public FakePresenterModule(LoginPresenter presenter) {
-        this.loginPresenter = presenter;
+    private FakePresenterModule() {
+        loginPresenter = mock(LoginPresenter.class);
         profilePresenter = mock(ProfilePresenter.class);
         shopListPresenter = mock(ShopListPresenter.class);
         shopDetailPresenter = mock(ShopDetailPresenter.class);
+    }
+
+    public FakePresenterModule(LoginPresenter presenter) {
+        this();
+        this.loginPresenter = presenter;
     }
 
     public FakePresenterModule(ProfilePresenter presenter) {
+        this();
         this.profilePresenter = presenter;
-        loginPresenter = mock(LoginPresenter.class);
-        shopListPresenter = mock(ShopListPresenter.class);
-        shopDetailPresenter = mock(ShopDetailPresenter.class);
     }
 
     public FakePresenterModule(ShopListPresenter shop) {
+        this();
         this.shopListPresenter = shop;
-        loginPresenter = mock(LoginPresenter.class);
-        profilePresenter = mock(ProfilePresenter.class);
-        shopDetailPresenter = mock(ShopDetailPresenter.class);
     }
 
     public FakePresenterModule(ShopDetailPresenter shop) {
+        this();
         this.shopDetailPresenter = shop;
-        shopListPresenter = mock(ShopListPresenter.class);
-        loginPresenter = mock(LoginPresenter.class);
-        profilePresenter = mock(ProfilePresenter.class);
+    }
+
+    public FakePresenterModule(ShopFriendPresenter presenter) {
+        this();
+        this.shopFriendPresenter = presenter;
     }
 
     @Provides
-    public LoginPresenter provideLoginPresenter() {
+    LoginPresenter provideLoginPresenter() {
         return loginPresenter;
     }
 
     @Provides
-    public ProfilePresenter provideProfilePresenter() {
+    ProfilePresenter provideProfilePresenter() {
         return profilePresenter;
     }
 
     @Provides
-    public ShopListPresenter shopListPresenter() {
+    ShopListPresenter shopListPresenter() {
         return shopListPresenter;
     }
 
     @Provides
-    public ShopDetailPresenter shopDetailPresenter() {
+    ShopDetailPresenter shopDetailPresenter() {
         return shopDetailPresenter;
+    }
+
+    @Provides
+    ShopFriendPresenter shopFriendPresenter() {
+        return shopFriendPresenter;
     }
 }

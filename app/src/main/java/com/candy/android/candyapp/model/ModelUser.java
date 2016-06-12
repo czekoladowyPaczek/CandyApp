@@ -51,4 +51,13 @@ public class ModelUser {
     public void setFriends(List<ModelFriend> friends) {
         this.friends = friends;
     }
+
+    public boolean isFriend(long userId) {
+        for (ModelFriend friend : friends) {
+            if (friend.getId() == userId && friend.getStatus().equals(ModelFriend.STATUS_ACCEPTED)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

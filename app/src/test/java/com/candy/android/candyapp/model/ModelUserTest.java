@@ -5,7 +5,12 @@ import com.google.gson.GsonBuilder;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Marcin
@@ -46,5 +51,35 @@ public class ModelUserTest {
         assertEquals(2, user.getFriends().size());
         assertEquals(109370069480913L, user.getFriends().get(0).getId());
         assertEquals(115864548829752L, user.getFriends().get(1).getId());
+    }
+
+    @Test
+    public void isFriend_shouldBeFriend() {
+        ModelUser user = getTestUser();
+
+        assertTrue(user.isFriend(2));
+    }
+
+    @Test
+    public void isFriend_shouldNotBeFriendWhenNotOnFriendList() {
+        assertFalse(getTestUser().isFriend(5));
+    }
+
+    @Test
+    public void isFriend_shouldNotBeFriendWhenWaitingAcceptance() {
+        assertFalse(getTestUser().isFriend(4));
+    }
+
+    @Test
+    public void isFriend_shouldNotBeFriendWhenInvitedButNotAccepted() {
+        assertFalse(getTestUser().isFriend(3));
+    }
+
+    private ModelUser getTestUser() {
+        List<ModelFriend> friends = new ArrayList<>(2);
+        friends.add(new ModelFriend(2, "", "", ModelFriend.STATUS_ACCEPTED));
+        friends.add(new ModelFriend(3, "", "", ModelFriend.STATUS_INVITED));
+        friends.add(new ModelFriend(4, "", "", ModelFriend.STATUS_WAITING));
+        return new ModelUser(1, "", "", "", friends);
     }
 }

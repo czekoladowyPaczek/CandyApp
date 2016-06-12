@@ -6,6 +6,7 @@ import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.profile.ProfilePresenter;
 import com.candy.android.candyapp.shop.ShopDetailPresenter;
+import com.candy.android.candyapp.shop.ShopFriendPresenter;
 import com.candy.android.candyapp.shop.ShopListPresenter;
 
 import dagger.Module;
@@ -17,7 +18,7 @@ import dagger.Provides;
 @Module
 public class PresenterModule {
     @Provides
-    public LoginPresenter provideLoginPresenter(FacebookLogin facebookLogin, UserManager manager) {
+    LoginPresenter provideLoginPresenter(FacebookLogin facebookLogin, UserManager manager) {
         return new LoginPresenter(facebookLogin, manager);
     }
 
@@ -34,5 +35,10 @@ public class PresenterModule {
     @Provides
     ShopDetailPresenter shopDetailPresenter(ShopManager manager) {
         return new ShopDetailPresenter(manager);
+    }
+
+    @Provides
+    ShopFriendPresenter shopFriendPresenter(ShopManager manager, UserManager userManager) {
+        return new ShopFriendPresenter(manager, userManager);
     }
 }

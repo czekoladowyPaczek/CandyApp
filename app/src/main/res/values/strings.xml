@@ -64,4 +64,6 @@
     <string name="detail_no_items">You don\'t have any items. \nAdd new.</string>
     <string name="detail_delete_list">Delete</string>
     <string name="detail_deleting_list">Removing list</string>
+
+    <string name="friend_retry">Retry</string>
 </resources>

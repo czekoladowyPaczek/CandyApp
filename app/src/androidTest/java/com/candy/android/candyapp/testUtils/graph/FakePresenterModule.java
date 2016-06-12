@@ -3,6 +3,7 @@ package com.candy.android.candyapp.testUtils.graph;
 import com.candy.android.candyapp.login.LoginPresenter;
 import com.candy.android.candyapp.profile.ProfilePresenter;
 import com.candy.android.candyapp.shop.ShopDetailPresenter;
+import com.candy.android.candyapp.shop.ShopFriendPresenter;
 import com.candy.android.candyapp.shop.ShopListPresenter;
 
 import dagger.Module;
@@ -20,12 +21,14 @@ public class FakePresenterModule {
     private ProfilePresenter profile;
     private ShopListPresenter shopList;
     private ShopDetailPresenter shopDetail;
+    private ShopFriendPresenter shopFriend;
 
     public FakePresenterModule() {
         login = mock(LoginPresenter.class);
         profile = mock(ProfilePresenter.class);
         shopList = mock(ShopListPresenter.class);
         shopDetail = mock(ShopDetailPresenter.class);
+        shopFriend = mock(ShopFriendPresenter.class);
     }
 
     public FakePresenterModule(LoginPresenter login, ProfilePresenter profile) {
@@ -49,6 +52,11 @@ public class FakePresenterModule {
         this.shopDetail = detail;
     }
 
+    public FakePresenterModule(ShopFriendPresenter presenter) {
+        this();
+        this.shopFriend = presenter;
+    }
+
     @Provides
     public LoginPresenter provideLoginPresenter() {
         return login;
@@ -67,5 +75,10 @@ public class FakePresenterModule {
     @Provides
     ShopDetailPresenter shopDetailPresenter() {
         return shopDetail;
+    }
+
+    @Provides
+    ShopFriendPresenter shopFriendPresenter() {
+        return shopFriend;
     }
 }

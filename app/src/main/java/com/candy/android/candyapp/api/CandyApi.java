@@ -3,6 +3,7 @@ package com.candy.android.candyapp.api;
 import com.candy.android.candyapp.api.request.RequestAcceptFriend;
 import com.candy.android.candyapp.api.request.RequestCreateShopList;
 import com.candy.android.candyapp.api.request.RequestInviteFriend;
+import com.candy.android.candyapp.api.request.RequestShopUser;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
@@ -40,6 +41,8 @@ public interface  CandyApi {
 
     @GET("/shop")
     Observable<List<ModelShop>> getShopLists(@Header("Authorization") String token);
+    @GET("/shop/{id}")
+    Observable<ModelShop> getShopList(@Header("Authorization") String token, @Path("id") String id);
     @POST("/shop")
     Observable<ModelShop> createShopList(@Header("Authorization") String token, @Body RequestCreateShopList body);
     @DELETE("/shop/{id}")
@@ -47,4 +50,10 @@ public interface  CandyApi {
 
     @GET("/shop/{id}/item")
     Observable<List<ModelShopItem>> getItems(@Header("Authorization") String token, @Path("id") String id);
+
+    @POST("/invitation/shop")
+    Observable<Void> inviteToList(@Header("Authorization") String token, @Body RequestShopUser body);
+
+    @DELETE("/invitation/shop")
+    Observable<Void> removeFromList(@Header("Authorization") String token, @Body RequestShopUser body);
 }

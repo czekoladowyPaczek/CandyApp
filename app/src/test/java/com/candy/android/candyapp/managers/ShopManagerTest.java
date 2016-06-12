@@ -1,20 +1,32 @@
 package com.candy.android.candyapp.managers;
 
+import com.candy.android.candyapp.BuildConfig;
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.api.request.RequestCreateShopList;
+import com.candy.android.candyapp.api.request.RequestShopUser;
+import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
 import com.candy.android.candyapp.model.ModelShopItemTest;
 import com.candy.android.candyapp.model.ModelShopTest;
+import com.candy.android.candyapp.model.ModelShopUser;
+import com.candy.android.candyapp.model.ModelUser;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLog;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -23,6 +35,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,6 +43,8 @@ import static org.mockito.Mockito.when;
 /**
  * @author Marcin
  */
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
 public class ShopManagerTest {
 
     private static final String TOKEN = "token";
@@ -40,6 +55,7 @@ public class ShopManagerTest {
 
     @Before
     public void setup() throws Exception {
+        ShadowLog.stream = System.out;
         api = mock(CandyApi.class);
         userManager = mock(UserManager.class);
         when(userManager.getToken()).thenReturn(TOKEN);
@@ -241,5 +257,216 @@ public class ShopManagerTest {
         verify(api, times(2)).getItems(anyString(), eq("123"));
         verify(api, times(1)).getShopLists(anyString());
         assertEquals(1, shopSub.getOnNextEvents().get(0).size());
+    }
+
+    @Test
+    public void getShopList_returnItemFromApiAndSaveInCacheOnSuccess() {
+        ModelShop shop = ModelShopTest.getModelShop();
+        insertShopListsToCache();
+        when(api.getShopList(anyString(), anyString())).thenReturn(Observable.just(shop));
+
+        TestSubscriber<ModelShop> sub = new TestSubscriber<>();
+        manager.getShopList(shop.getId(), true).subscribe(sub);
+        manager.getShopList(shop.getId(), true).subscribe(sub);
+
+        sub.assertNoErrors();
+        verify(api).getShopList("Bearer " + TOKEN, shop.getId());
+    }
+
+    @Test
+    public void getShopList_returnErrorOnApiErrorAndNotRemoveFromCache() {
+        insertShopListsToCache();
+        when(api.getShopList(anyString(), anyString())).thenReturn(Observable.error(new Throwable()));
+
+        TestSubscriber<ModelShop> sub = new TestSubscriber<>();
+        manager.getShopList("2", false).subscribe(sub);
+        TestSubscriber<ModelShop> sub2 = new TestSubscriber<>();
+        manager.getShopList("2", true).subscribe(sub2);
+
+        sub.assertError(Throwable.class);
+        verify(api, times(1)).getShopList(anyString(), anyString());
+    }
+
+    @Test
+    public void getShopList_shouldRemoveFromCacheOnApiListNotAvailableError() {
+        insertShopListsToCache();
+        when(api.getShopList(anyString(), anyString())).thenReturn(Observable.error(ModelError.generateError(ModelError.LIST_NOT_EXIST)));
+
+        TestSubscriber<ModelShop> sub = new TestSubscriber<>();
+        manager.getShopList("2", false).subscribe(sub);
+        TestSubscriber<ModelShop> sub2 = new TestSubscriber<>();
+        manager.getShopList("2", true).subscribe(sub2);
+
+        sub.assertError(Throwable.class);
+        verify(api, times(2)).getShopList(anyString(), anyString());
+    }
+
+    @Test
+    public void getShopList_returnItemFromApiIfCacheNotRequested() {
+        insertShopListsToCache();
+        ModelShop shop = ModelShopTest.getModelShop();
+        insertShopListsToCache();
+        when(api.getShopList(anyString(), anyString())).thenReturn(Observable.just(shop));
+
+        TestSubscriber<ModelShop> sub = new TestSubscriber<>();
+        manager.getShopList("1", false).subscribe(sub);
+
+        sub.assertNoErrors();
+        verify(api).getShopList("Bearer " + TOKEN, "1");
+    }
+
+    @Test
+    public void getShopList_returnItemFromCacheIfAvailableInCache() {
+        insertShopListsToCache();
+
+        TestSubscriber<ModelShop> sub = new TestSubscriber<>();
+        manager.getShopList("1", true).subscribe(sub);
+
+        sub.assertNoErrors();
+        assertEquals("1", sub.getOnNextEvents().get(0).getId());
+        verify(api, never()).getShopList(anyString(), anyString());
+    }
+
+    @Test
+    public void getShopList_returnItemFromApiIfNotAvailableFromCache() {
+        ModelShop shop = ModelShopTest.getModelShop();
+        insertShopListsToCache();
+        when(api.getShopList(anyString(), anyString())).thenReturn(Observable.just(shop));
+
+        TestSubscriber<ModelShop> sub = new TestSubscriber<>();
+        manager.getShopList(shop.getId(), true).subscribe(sub);
+
+        sub.assertNoErrors();
+        verify(api).getShopList("Bearer " + TOKEN, shop.getId());
+    }
+
+    @Test
+    public void inviteToShop_shouldCallApiAndAddUserToList() {
+        when(userManager.getUser()).thenReturn(getUser());
+        insertShopListsToCache();
+        when(api.inviteToList(anyString(), any(RequestShopUser.class))).thenReturn(Observable.just(null));
+        TestSubscriber<ModelShop> testShop = new TestSubscriber<>();
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.inviteToShop("1", new ModelFriend(3, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+
+        sub.assertNoErrors();
+        ArgumentCaptor<RequestShopUser> argument = ArgumentCaptor.forClass(RequestShopUser.class);
+        verify(api).inviteToList(eq("Bearer " + TOKEN), argument.capture());
+        assertEquals("1", argument.getValue().getShopId());
+        assertEquals(3L, argument.getValue().getUserId());
+        manager.getShopList("1", true).subscribe(testShop);
+        assertEquals(3, testShop.getOnNextEvents().get(0).getUsers().size());
+    }
+
+    @Test
+    public void inviteToShop_shouldReturnErrorWhenUserIsNotOwner() {
+        when(userManager.getUser()).thenReturn(getUser());
+        insertShopListsToCache();
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.inviteToShop("2", new ModelFriend(3, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+
+        sub.assertError(HttpException.class);
+        assertEquals(ModelError.NOT_PERMITTED, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
+        verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
+    }
+
+    @Test
+    public void inviteToShop_shouldReturnErrorWhenUserAlreadyInvited() {
+        when(userManager.getUser()).thenReturn(getUser());
+        insertShopListsToCache();
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.inviteToShop("1", new ModelFriend(2, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+
+        sub.assertError(HttpException.class);
+        assertEquals(ModelError.ALREADY_INVITED, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
+        verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
+    }
+
+    @Test
+    public void inviteToShop_shouldReturnErrorWhenUserNotOnFriendList() {
+        when(userManager.getUser()).thenReturn(getUser());
+        insertShopListsToCache();
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.inviteToShop("1", new ModelFriend(4, "", "", ModelFriend.STATUS_INVITED)).subscribe(sub);
+
+        sub.assertError(HttpException.class);
+        assertEquals(ModelError.NOT_ON_FRIEND_LIST, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
+        verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
+    }
+
+    @Test
+    public void removeFromShop_shouldCallApiAndRemoveUserFromCache() {
+        when(api.removeFromList(anyString(), any(RequestShopUser.class))).thenReturn(Observable.just(null));
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.removeFromShop("1", new ModelFriend(2, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+
+        sub.assertNoErrors();
+        ArgumentCaptor<RequestShopUser> argument = ArgumentCaptor.forClass(RequestShopUser.class);
+        verify(api).removeFromList(eq("Bearer " + TOKEN), argument.capture());
+        assertEquals("1", argument.getValue().getShopId());
+        assertEquals(2L, argument.getValue().getUserId());
+    }
+
+    @Test
+    public void removeFromShop_shouldReturnErrorWhenUserIsNotOwner() {
+        when(userManager.getUser()).thenReturn(getUser());
+        insertShopListsToCache();
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.removeFromShop("2", new ModelFriend(2, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+
+        sub.assertError(HttpException.class);
+        assertEquals(ModelError.NOT_PERMITTED, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
+        verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
+    }
+
+    @Test
+    public void removeFromShop_shouldReturnErrorWhenUserWasNotInvited() {
+        when(userManager.getUser()).thenReturn(getUser());
+        insertShopListsToCache();
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.removeFromShop("1", new ModelFriend(3, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+
+        sub.assertError(HttpException.class);
+        assertEquals(ModelError.USER_IS_NOT_INVITED, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
+        verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
+    }
+
+    @Test
+    public void removeFromShop_shouldReturnErrorWhenUserWantsToRemoveOwner() {
+        when(userManager.getUser()).thenReturn(getUser());
+        insertShopListsToCache();
+
+        TestSubscriber<Void> sub = new TestSubscriber<>();
+        manager.removeFromShop("1", new ModelFriend(1, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+
+        sub.assertError(HttpException.class);
+        assertEquals(ModelError.CANNOT_REMOVE_OWNER, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
+        verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
+    }
+
+    private ModelUser getUser() {
+        List<ModelFriend> friends = new ArrayList<>(2);
+        friends.add(new ModelFriend(2, "", "", ModelFriend.STATUS_ACCEPTED));
+        friends.add(new ModelFriend(3, "", "", ModelFriend.STATUS_ACCEPTED));
+        friends.add(new ModelFriend(4, "", "", ModelFriend.STATUS_INVITED));
+        return new ModelUser(1, "", "", "", friends);
+    }
+
+    private void insertShopListsToCache() {
+        List<ModelShopUser> users = new ArrayList<>(2);
+        users.add(new ModelShopUser(1, "name 1", ""));
+        users.add(new ModelShopUser(2, "name 2", ""));
+        List<ModelShop> shops = new ArrayList<>(2);
+        shops.add(new ModelShop("1", users.get(0), users, "list 1", Calendar.getInstance().getTime()));
+        shops.add(new ModelShop("2", users.get(1), users, "list 2", Calendar.getInstance().getTime()));
+        when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
+        manager.getShopLists(false).subscribe(new TestSubscriber<>());
     }
 }

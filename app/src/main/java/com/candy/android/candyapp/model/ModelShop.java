@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -42,7 +44,7 @@ public class ModelShop implements Parcelable {
     }
 
     public ModelShop() {
-
+        this("1", new ModelShopUser(1, "", ""), new ArrayList<>(0), "", Calendar.getInstance().getTime());
     }
 
     public ModelShop(String id, ModelShopUser owner, List<ModelShopUser> users, String name, Date modificationDate) {
@@ -57,7 +59,7 @@ public class ModelShop implements Parcelable {
         id = in.readString();
         owner = (ModelShopUser) in.readValue(ModelShopUser.class.getClassLoader());
         if (in.readByte() == 0x01) {
-            users = new ArrayList<ModelShopUser>();
+            users = new ArrayList<>();
             in.readList(users, ModelShopUser.class.getClassLoader());
         } else {
             users = null;
@@ -65,6 +67,31 @@ public class ModelShop implements Parcelable {
         name = in.readString();
         long tmpModificationDate = in.readLong();
         modificationDate = tmpModificationDate != -1 ? new Date(tmpModificationDate) : null;
+    }
+
+    public boolean isOwner(long userId) {
+        return owner.getId() == userId;
+    }
+
+    public boolean isInvited(long userId) {
+        for (ModelShopUser user : users) {
+            if (user.getId() == userId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void removeUser(long userId) {
+        if (owner.getId() != userId) {
+            Iterator<ModelShopUser> userIterator = users.iterator();
+            while(userIterator.hasNext()) {
+                if (userIterator.next().getId() == userId) {
+                    userIterator.remove();
+                    break;
+                }
+            }
+        }
     }
 
     @Override

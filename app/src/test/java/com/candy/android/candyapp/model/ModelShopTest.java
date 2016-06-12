@@ -5,10 +5,14 @@ import com.google.gson.GsonBuilder;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author Marcin
@@ -44,5 +48,49 @@ public class ModelShopTest {
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                 .create();
         return gson.fromJson(JSON, ModelShop.class);
+    }
+
+    @Test
+    public void isOwner() {
+        ModelShop shop = new ModelShop("1", new ModelShopUser(1, "", ""), new ArrayList<>(), "", Calendar.getInstance().getTime());
+
+        assertTrue(shop.isOwner(1));
+        assertFalse(shop.isOwner(2));
+    }
+
+    @Test
+    public void isInvited() {
+        List<ModelShopUser> users = new ArrayList<>(2);
+        users.add(new ModelShopUser(1, "", ""));
+        users.add(new ModelShopUser(2, "", ""));
+        ModelShop shop = new ModelShop("1", new ModelShopUser(1, "", ""), users, "", Calendar.getInstance().getTime());
+
+        assertTrue(shop.isInvited(1));
+        assertTrue(shop.isInvited(2));
+        assertFalse(shop.isInvited(3));
+    }
+
+    @Test
+    public void removeUser_shouldRemoveIfNotOwner() {
+        List<ModelShopUser> users = new ArrayList<>(2);
+        users.add(new ModelShopUser(1, "", ""));
+        users.add(new ModelShopUser(2, "", ""));
+        ModelShop shop = new ModelShop("1", new ModelShopUser(1, "", ""), users, "", Calendar.getInstance().getTime());
+
+        shop.removeUser(users.get(1).getId());
+
+        assertEquals(1, shop.getUsers().size());
+    }
+
+    @Test
+    public void removeUser_shouldNotRemoveIfOwner() {
+        List<ModelShopUser> users = new ArrayList<>(2);
+        users.add(new ModelShopUser(1, "", ""));
+        users.add(new ModelShopUser(2, "", ""));
+        ModelShop shop = new ModelShop("1", new ModelShopUser(1, "", ""), users, "", Calendar.getInstance().getTime());
+
+        shop.removeUser(users.get(0).getId());
+
+        assertEquals(2, shop.getUsers().size());
     }
 }
