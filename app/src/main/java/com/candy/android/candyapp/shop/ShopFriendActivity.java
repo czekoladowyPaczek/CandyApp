@@ -16,7 +16,9 @@ import android.view.View;
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.model.ModelShop;
-import com.candy.android.candyapp.shop.adapter.ShopUserAdapter;
+import com.candy.android.candyapp.shop.holder.ShopUserHolder;
+import com.candy.android.candyapp.ui.AdapterClickListener;
+import com.candy.android.candyapp.ui.UserAdapter;
 
 import java.util.ArrayList;
 
@@ -30,7 +32,7 @@ import rx.Observable;
  * Created by marcingawel on 11.06.2016.
  */
 
-public class ShopFriendActivity extends AppCompatActivity implements ShopUserAdapter.ClickListener {
+public class ShopFriendActivity extends AppCompatActivity implements AdapterClickListener {
     public static final String SHOP = "com.candy.android.shop";
 
     @Inject
@@ -46,7 +48,7 @@ public class ShopFriendActivity extends AppCompatActivity implements ShopUserAda
     @BindView(R.id.add_friend_button)
     FloatingActionButton addUser;
 
-    private ShopUserAdapter adapter;
+    private UserAdapter<ShopUserHolder> adapter;
     private LinearLayoutManager manager;
     private ModelShop shop;
 
@@ -72,7 +74,7 @@ public class ShopFriendActivity extends AppCompatActivity implements ShopUserAda
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(shop.getName());
 
-        adapter = new ShopUserAdapter(this, shop.getUsers(), this);
+        adapter = new UserAdapter<>(this, shop.getUsers(), new ShopUserHolder.Builder(), this);
         manager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);

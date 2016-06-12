@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.StringDef;
 
+import com.candy.android.candyapp.ui.ModelViewHolder;
 import com.google.gson.annotations.SerializedName;
 
 import java.lang.annotation.Retention;
@@ -13,7 +14,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Marcin
  */
 
-public class ModelFriend implements Parcelable {
+public class ModelFriend implements Parcelable, ModelViewHolder {
     @StringDef({STATUS_ACCEPTED, STATUS_INVITED, STATUS_WAITING})
     @Retention(RetentionPolicy.SOURCE)
     public @interface FriendStatus {}

@@ -32,6 +32,7 @@ import com.candy.android.candyapp.helper.UiHelper;
 import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
+import com.candy.android.candyapp.ui.UserAdapter;
 import com.candy.android.zlog.ZLog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
@@ -82,7 +83,7 @@ public class ProfileActivity extends AppCompatActivity {
     ProfilePresenter presenter;
 
     private List<ModelFriend> friends;
-    private FriendRecyclerAdapter adapter;
+    private UserAdapter<FriendViewHolder> adapter;
 
     private Dialog friendDialog;
     private Dialog friendActionDialog;
@@ -100,7 +101,7 @@ public class ProfileActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         friends = new ArrayList<>();
-        adapter = new FriendRecyclerAdapter(this, friends, position -> showFriendActionChoice(friends.get(position)));
+        adapter = new UserAdapter<>(this, friends, new FriendViewHolder.Builder(), position -> showFriendActionChoice(friends.get(position)));
         friendsView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         friendsView.setAdapter(adapter);
 

@@ -24,7 +24,8 @@ import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
-import com.candy.android.candyapp.shop.adapter.ShopItemsAdapter;
+import com.candy.android.candyapp.shop.holder.ShopItemViewHolder;
+import com.candy.android.candyapp.ui.ShopAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,7 @@ public class ShopDetailFragment extends Fragment {
     @BindView(R.id.createShopButton)
     FloatingActionButton createShopButton;
 
-    private ShopItemsAdapter adapter;
+    private ShopAdapter<ShopItemViewHolder> adapter;
     private List<ModelShopItem> items;
 
     private Dialog removingDialog;
@@ -104,7 +105,7 @@ public class ShopDetailFragment extends Fragment {
         activity.getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         items = new ArrayList<>();
-        adapter = new ShopItemsAdapter(getContext(), items, null);
+        adapter = new ShopAdapter<>(getContext(), items, new ShopItemViewHolder.Builder(), position -> {});
         shopList.setLayoutManager(new LinearLayoutManager(getContext()));
         shopList.setAdapter(adapter);
         refreshLayout.setOnRefreshListener(() -> presenter.getShopListItems(false));

@@ -28,7 +28,8 @@ import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.helper.UiHelper;
 import com.candy.android.candyapp.model.ModelShop;
-import com.candy.android.candyapp.shop.adapter.ShopAdapter;
+import com.candy.android.candyapp.shop.holder.ShopViewHolder;
+import com.candy.android.candyapp.ui.ShopAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,7 @@ public class ShopListFragment extends Fragment {
     @BindView(R.id.create_shop_name)
     EditText shopNameView;
 
-    private ShopAdapter adapter;
+    private ShopAdapter<ShopViewHolder> adapter;
     private LinearLayoutManager layoutManager;
     private List<ModelShop> shops;
 
@@ -100,7 +101,7 @@ public class ShopListFragment extends Fragment {
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         shops = new ArrayList<>();
-        adapter = new ShopAdapter(getContext(), shops,
+        adapter = new ShopAdapter<>(getContext(), shops, new ShopViewHolder.Builder(),
                 position -> ((OnShopItemSelected) getActivity()).onItemSelected(shops.get(position)));
         layoutManager = new LinearLayoutManager(getContext());
         shopList.setLayoutManager(layoutManager);

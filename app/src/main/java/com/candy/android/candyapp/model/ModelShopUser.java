@@ -3,11 +3,13 @@ package com.candy.android.candyapp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.candy.android.candyapp.ui.ModelViewHolder;
+
 /**
  * @author Marcin
  */
 
-public class ModelShopUser implements Parcelable {
+public class ModelShopUser implements Parcelable, ModelViewHolder {
     private long id;
     private String name;
     private String picture;

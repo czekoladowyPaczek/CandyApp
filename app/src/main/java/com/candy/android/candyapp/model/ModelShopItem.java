@@ -2,6 +2,7 @@ package com.candy.android.candyapp.model;
 
 import android.support.annotation.StringDef;
 
+import com.candy.android.candyapp.ui.ModelViewHolder;
 import com.google.gson.annotations.SerializedName;
 
 import java.lang.annotation.Retention;
@@ -13,7 +14,7 @@ import java.util.Date;
  * @author Marcin
  */
 
-public class ModelShopItem {
+public class ModelShopItem implements ModelViewHolder {
     @StringDef({PIECE, GRAM, KILOGRAM, MILLILITER, LITER})
     @Retention(RetentionPolicy.SOURCE)
     @interface ItemMetric {}

@@ -3,6 +3,7 @@ package com.candy.android.candyapp.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.candy.android.candyapp.ui.ModelViewHolder;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
  * Created by marcingawel on 02.06.2016.
  */
 
-public class ModelShop implements Parcelable {
+public class ModelShop implements Parcelable, ModelViewHolder {
     private String id;
     private ModelShopUser owner;
     private List<ModelShopUser> users;

@@ -155,6 +155,7 @@ public class ShopFriendActivityTest {
         SystemClock.sleep(100);
         subject.onNext(newShopList);
         subject.onCompleted();
+        SystemClock.sleep(100);
 
         onView(withText(userList.getName())).check(matches(isDisplayed()));
         onView(withId(R.id.add_friend_button)).check(matches(not(isDisplayed())));
