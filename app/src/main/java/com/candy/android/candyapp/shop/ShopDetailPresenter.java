@@ -84,9 +84,9 @@ public class ShopDetailPresenter {
             fragment.showListLoading(false);
             fragment.setData(items);
             getItemsObs = null;
-        }, error -> {
+        }, err -> {
             fragment.showListLoading(false);
-            fragment.showError(0);
+            showError(err);
             getItemsObs = null;
         });
     }
@@ -98,20 +98,24 @@ public class ShopDetailPresenter {
             removeListObs = null;
         }, error -> {
             fragment.hideRemovingDialog();
-            switch (ModelError.fromRetrofit(error).getCode()) {
-                case ModelError.INTERNET_CONNECTION:
-                    fragment.showError(R.string.error_connection);
-                    break;
-                case ModelError.LIST_NOT_EXIST:
-                    fragment.showError(R.string.shop_error_list_not_exist);
-                    break;
-                case ModelError.NOT_PERMITTED:
-                    fragment.showError(R.string.error_not_permitted);
-                    break;
-                default:
-                    fragment.showError(R.string.error_unknown);
-            }
+            showError(error);
             removeListObs = null;
         });
+    }
+
+    private void showError(Throwable error) {
+        switch (ModelError.fromRetrofit(error).getCode()) {
+            case ModelError.INTERNET_CONNECTION:
+                fragment.showError(R.string.error_connection);
+                break;
+            case ModelError.LIST_NOT_EXIST:
+                fragment.showError(R.string.shop_error_list_not_exist);
+                break;
+            case ModelError.NOT_PERMITTED:
+                fragment.showError(R.string.error_not_permitted);
+                break;
+            default:
+                fragment.showError(R.string.error_unknown);
+        }
     }
 }
