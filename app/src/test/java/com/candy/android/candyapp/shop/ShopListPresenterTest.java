@@ -92,7 +92,7 @@ public class ShopListPresenterTest {
         presenter.removeParent();
         presenter.setParent(fragment);
 
-        verify(fragment, times(2)).showListLoading(true);
+        verify(fragment, times(1)).showListLoading(true);
         verify(fragment).showLoadingDialog(R.string.shop_dialog_creating);
         verify(manager, times(2)).getShopLists(anyBoolean());
         verify(manager).createShopList(anyString());
@@ -114,7 +114,7 @@ public class ShopListPresenterTest {
         presenter.removeParent();
         presenter.setParent(fragment);
 
-        verify(fragment, times(2)).showListLoading(true);
+        verify(fragment, times(1)).showListLoading(true);
         verify(fragment).showLoadingDialog(R.string.shop_dialog_creating);
         verify(manager, times(2)).getShopLists(anyBoolean());
         verify(manager).createShopList(anyString());

@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import okhttp3.ResponseBody;
+import retrofit2.Response;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -221,14 +223,19 @@ public class ShopManagerTest {
     }
 
     @Test
-    public void removeShopList_shouldCallApi() {
-        when(api.deleteShopList(anyString(), anyString())).thenReturn(Observable.just(new ModelResponseSimple()));
-        TestSubscriber<ModelResponseSimple> sub = new TestSubscriber<>();
+    public void getShopItems_shouldRemoveShoppingListFromCacheIfItDoesNotExistOnServer() {
+        List<ModelShop> shops = new ArrayList<>();
+        shops.add(ModelShopTest.getModelShop());
+        when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.error(ModelError.generateError(ModelError.LIST_NOT_EXIST)));
 
-        manager.removeShopList("123").subscribe(sub);
+        TestSubscriber<List<ModelShop>> sub = new TestSubscriber<>();
+        manager.getShopLists(true).subscribe(new TestSubscriber<>());
+        manager.getShopItems(ModelShopTest.getModelShop().getId(), true).subscribe(new TestSubscriber<>());
+        manager.getShopLists(true).subscribe(sub);
 
-        verify(api).deleteShopList("Bearer " + TOKEN, "123");
         sub.assertNoErrors();
+        assertEquals(0, sub.getOnNextEvents().get(0).size());
     }
 
     @Test
@@ -254,6 +261,35 @@ public class ShopManagerTest {
 
         verify(api).deleteShopList("Bearer " + TOKEN, "123");
         sub.assertNoErrors();
+        verify(api, times(2)).getItems(anyString(), eq("123"));
+        verify(api, times(1)).getShopLists(anyString());
+        assertEquals(1, shopSub.getOnNextEvents().get(0).size());
+    }
+
+    @Test
+    public void removeShopList_shouldCallApiAndRemoveFromCacheIfAvailableOnNoListError() {
+        List<ModelShop> shops = new ArrayList<>();
+        shops.add(ModelShopTest.getModelShop());
+        shops.add(new ModelShop("123", null, null, "name", null));
+        List<ModelShopItem> items = new ArrayList<>(1);
+        items.add(ModelShopItemTest.getModelShopItem());
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(items));
+        when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
+        HttpException e = ModelError.generateError(ModelError.LIST_NOT_EXIST);
+        when(api.deleteShopList(anyString(), anyString())).thenReturn(Observable.error(e));
+        TestSubscriber<ModelResponseSimple> sub = new TestSubscriber<>();
+        TestSubscriber<List<ModelShop>> shopSub = new TestSubscriber<>();
+        TestSubscriber<List<ModelShopItem>> itemSub = new TestSubscriber<>();
+
+        manager.getShopItems("123", false).subscribe(new TestSubscriber<>());
+        manager.getShopLists(false).subscribe(new TestSubscriber<>());
+        manager.removeShopList("123").subscribe(sub);
+        manager.getShopItems("123", true).subscribe(itemSub);
+        manager.getShopLists(true).subscribe(shopSub);
+
+
+        verify(api).deleteShopList("Bearer " + TOKEN, "123");
+        sub.assertError(e);
         verify(api, times(2)).getItems(anyString(), eq("123"));
         verify(api, times(1)).getShopLists(anyString());
         assertEquals(1, shopSub.getOnNextEvents().get(0).size());
@@ -449,6 +485,34 @@ public class ShopManagerTest {
         sub.assertError(HttpException.class);
         assertEquals(ModelError.CANNOT_REMOVE_OWNER, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
         verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
+    }
+
+    public void removeShopList_shouldCallApiAndNotRemoveFromCacheIfDifferentErrorOccurred() {
+        List<ModelShop> shops = new ArrayList<>();
+        shops.add(ModelShopTest.getModelShop());
+        shops.add(new ModelShop("123", null, null, "name", null));
+        List<ModelShopItem> items = new ArrayList<>(1);
+        items.add(ModelShopItemTest.getModelShopItem());
+        when(api.getItems(anyString(), anyString())).thenReturn(Observable.just(items));
+        when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
+        HttpException e = ModelError.generateError(ModelError.NOT_PERMITTED);
+        when(api.deleteShopList(anyString(), anyString())).thenReturn(Observable.error(e));
+        TestSubscriber<ModelResponseSimple> sub = new TestSubscriber<>();
+        TestSubscriber<List<ModelShop>> shopSub = new TestSubscriber<>();
+        TestSubscriber<List<ModelShopItem>> itemSub = new TestSubscriber<>();
+
+        manager.getShopItems("123", false).subscribe(new TestSubscriber<>());
+        manager.getShopLists(false).subscribe(new TestSubscriber<>());
+        manager.removeShopList("123").subscribe(sub);
+        manager.getShopItems("123", true).subscribe(itemSub);
+        manager.getShopLists(true).subscribe(shopSub);
+
+
+        verify(api).deleteShopList("Bearer " + TOKEN, "123");
+        sub.assertError(e);
+        verify(api, times(1)).getItems(anyString(), eq("123"));
+        verify(api, times(1)).getShopLists(anyString());
+        assertEquals(2, shopSub.getOnNextEvents().get(0).size());
     }
 
     private ModelUser getUser() {

@@ -1,5 +1,7 @@
 package com.candy.android.candyapp.shop;
 
+import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.model.ModelShopItem;
@@ -16,7 +18,7 @@ import rx.schedulers.Schedulers;
  */
 
 public class ShopDetailPresenter {
-
+    private boolean freshStart = true;
     private ShopManager shopManager;
     private String listId;
     private ShopDetailFragment fragment;
@@ -35,7 +37,11 @@ public class ShopDetailPresenter {
         this.listId = listId;
         this.fragment = fragment;
 
-        fragment.showListLoading(true);
+        if (freshStart || getItemsObs != null) {
+            freshStart = false;
+            fragment.showListLoading(true);
+        }
+
         if (getItemsObs != null) {
             getItemsSub = subscribeToGetItems(getItemsObs);
         } else {
@@ -78,9 +84,9 @@ public class ShopDetailPresenter {
             fragment.showListLoading(false);
             fragment.setData(items);
             getItemsObs = null;
-        }, error -> {
+        }, err -> {
             fragment.showListLoading(false);
-            fragment.showError(0);
+            showError(err);
             getItemsObs = null;
         });
     }
@@ -92,8 +98,24 @@ public class ShopDetailPresenter {
             removeListObs = null;
         }, error -> {
             fragment.hideRemovingDialog();
-            fragment.showError(0); // TODO:
+            showError(error);
             removeListObs = null;
         });
+    }
+
+    private void showError(Throwable error) {
+        switch (ModelError.fromRetrofit(error)) {
+            case INTERNET_CONNECTION:
+                fragment.showError(R.string.error_connection);
+                break;
+            case LIST_NOT_EXIST:
+                fragment.showError(R.string.shop_error_list_not_exist);
+                break;
+            case NOT_PERMITTED:
+                fragment.showError(R.string.error_not_permitted);
+                break;
+            default:
+                fragment.showError(R.string.error_unknown);
+        }
     }
 }

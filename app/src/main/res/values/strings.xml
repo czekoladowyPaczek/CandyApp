@@ -58,6 +58,7 @@
     <string name="shop_dialog_creating">Creating new list</string>
     <string name="shop_error_missing_name">Name is required to create shop list</string>
     <string name="shop_error_count_limit">You cannot have so many shopping lists</string>
+    <string name="shop_error_list_not_exist">List doesn\'t exist</string>
     <string name="shop_create_shop_title">Create new shopping list</string>
     <string name="shop_create_shop_name">List name</string>
 

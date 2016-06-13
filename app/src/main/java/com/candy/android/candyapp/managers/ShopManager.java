@@ -48,9 +48,7 @@ public class ShopManager {
             return Observable.just(shops);
         } else {
             return api.getShopLists(getToken())
-                    .doOnNext(shops -> {
-                        this.shops = shops;
-                    });
+                    .doOnNext(shops -> this.shops = shops);
         }
     }
 
@@ -66,7 +64,7 @@ public class ShopManager {
             return api.getShopList(getToken(), shopId)
                     .doOnNext(this::addShopToCache)
                     .doOnError(error -> {
-                        if (ModelError.fromRetrofit(error) == ModelError.LIST_NOT_EXIST) {
+                        if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
                             removeShopFromCache(shopId);
                         }
                     });
@@ -85,6 +83,11 @@ public class ShopManager {
                     if (items.containsKey(id)) {
                         items.remove(id);
                     }
+                })
+                .doOnError(error -> {
+                    if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
+                        removeShopFromCache(id);
+                    }
                 });
     }
 
@@ -93,7 +96,12 @@ public class ShopManager {
             return Observable.just(items.get(id));
         } else {
             return api.getItems(getToken(), id)
-                    .doOnNext(items -> this.items.put(id, items));
+                    .doOnNext(items -> this.items.put(id, items))
+                    .doOnError(error -> {
+                        if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
+                            removeShopFromCache(id);
+                        }
+                    });
         }
     }
 
@@ -103,9 +111,9 @@ public class ShopManager {
         if (cachedShop != null) {
             if (!cachedShop.isOwner(currentUser.getId())) {
                 return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
-            } else if(cachedShop.isInvited(friend.getId())) {
+            } else if (cachedShop.isInvited(friend.getId())) {
                 return Observable.error(ModelError.generateError(ModelError.ALREADY_INVITED));
-            } else if(!currentUser.isFriend(friend.getId())) {
+            } else if (!currentUser.isFriend(friend.getId())) {
                 return Observable.error(ModelError.generateError(ModelError.NOT_ON_FRIEND_LIST));
             }
         }
@@ -124,9 +132,9 @@ public class ShopManager {
         if (shop != null) {
             if (!shop.isOwner(user.getId())) {
                 return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
-            } else if(!shop.isInvited(friend.getId())) {
+            } else if (!shop.isInvited(friend.getId())) {
                 return Observable.error(ModelError.generateError(ModelError.USER_IS_NOT_INVITED));
-            } else if(shop.isOwner(friend.getId())) {
+            } else if (shop.isOwner(friend.getId())) {
                 return Observable.error(ModelError.generateError(ModelError.CANNOT_REMOVE_OWNER));
             }
         }
@@ -180,6 +188,9 @@ public class ShopManager {
                     break;
                 }
             }
+        }
+        if (items.containsKey(id)) {
+            items.remove(id);
         }
     }
 

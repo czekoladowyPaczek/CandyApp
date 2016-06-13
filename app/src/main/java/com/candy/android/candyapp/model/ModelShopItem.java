@@ -31,6 +31,14 @@ public class ModelShopItem implements ModelViewHolder {
     @SerializedName("modification_date")
     private Date modificationDate;
 
+    public ModelShopItem(String id, String name, double count, @ItemMetric String metric, Date modificationDate) {
+        this.id = id;
+        this.name = name;
+        this.count = count;
+        this.metric = metric;
+        this.modificationDate = modificationDate;
+    }
+
     public String getId() {
         return id;
     }

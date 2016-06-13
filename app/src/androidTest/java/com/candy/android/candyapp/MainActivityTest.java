@@ -50,12 +50,14 @@ import static org.mockito.Mockito.when;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
 
+    private ShopManager manager;
+
     @Rule
     public ActivityTestRule<MainActivity> activityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
 
     @Before
     public void setup() {
-        ShopManager manager = mock(ShopManager.class);
+        manager = mock(ShopManager.class);
         ShopListPresenter presenter = new ShopListPresenter(manager);
         ShopDetailPresenter detailPresenter = new ShopDetailPresenter(manager);
 
@@ -88,7 +90,7 @@ public class MainActivityTest {
 
     @Test
     public void shouldSwitchToDetailFragmentAndRecreate() {
-        onView(withId(R.id.shop_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        switchToDetailView();
 
         onView(withId(R.id.shop_detail_list)).check(matches(isDisplayed()));
 
@@ -97,7 +99,7 @@ public class MainActivityTest {
 
     @Test
     public void shouldSwitchToDetailFragmentAndRecreateAfterPressBack() {
-        onView(withId(R.id.shop_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        switchToDetailView();
 
         onView(withId(R.id.shop_detail_list)).check(matches(isDisplayed()));
         pressBack();
@@ -107,12 +109,42 @@ public class MainActivityTest {
 
     @Test
     public void shouldSwitchToDetailFragmentAndRecreateAfterListDeleted() {
-        onView(withId(R.id.shop_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
+        switchToDetailView();
 
         onView(withId(R.id.shop_detail_list)).check(matches(isDisplayed()));
         onView(withId(R.id.menu_delete)).perform(click());
         onView(withId(R.id.shop_list)).check(matches(isDisplayed()));
 
         activityTestRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    }
+//
+//    @Test
+//    public void shouldAddShoppingItem() {
+//        when(manager.addShoppingItem(any(ModelShopItem.class)))
+//                .thenReturn(Observable.just(new ModelShopItem("id", "cool name", 0.5, ModelShopItem.LITER, Calendar.getInstance().getTime())));
+//
+//        switchToDetailView();
+//        onView(withId(R.id.create_shop_accept)).perform(click());
+//        onView(withId(R.id.item_name)).perform(typeText("name"));
+//        onView(withId(R.id.item_count)).perform(typeText("0.5"));
+//        onView(withText(R.string.item_save)).perform(click());
+//
+//        onView(withText("cool name")).check(matches(isDisplayed()));
+//    }
+//
+//    @Test
+//    public void shouldDoNothingWhenUserCancelsItemAdding() {
+//        when(manager.addShoppingItem(any(ModelShopItem.class)))
+//                .thenReturn(Observable.just(new ModelShopItem("id", "cool name", 0.5, ModelShopItem.LITER, Calendar.getInstance().getTime())));
+//        switchToDetailView();
+//        onView(withId(R.id.create_shop_accept)).perform(click());
+//        onView(withId(R.id.item_cancel)).perform(click());
+//
+//        onView(withId(R.id.shop_detail_list)).check(matches(isDisplayed()));
+//        onView(withText("cool name")).check(matches(not(isDisplayed())));
+//    }
+
+    private void switchToDetailView() {
+        onView(withId(R.id.shop_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
     }
 }
