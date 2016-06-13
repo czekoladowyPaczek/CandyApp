@@ -45,6 +45,6 @@ public interface  CandyApi {
     @DELETE("/shop/{id}")
     Observable<ModelResponseSimple> deleteShopList(@Header("Authorization") String token, @Path("id") String id);
 
-    @GET("/shop/{id}")
+    @GET("/shop/{id}/item")
     Observable<List<ModelShopItem>> getItems(@Header("Authorization") String token, @Path("id") String id);
 }

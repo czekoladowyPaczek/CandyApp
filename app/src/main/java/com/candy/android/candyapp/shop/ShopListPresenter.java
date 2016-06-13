@@ -1,7 +1,5 @@
 package com.candy.android.candyapp.shop;
 
-import android.support.annotation.StringRes;
-
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.managers.ShopManager;
@@ -76,25 +74,7 @@ public class ShopListPresenter {
     }
 
     private void showError(Throwable error) {
-        @StringRes int res;
-        switch (ModelError.fromRetrofit(error).getCode()) {
-            case ModelError.INTERNET_CONNECTION:
-                res = R.string.error_connection;
-                break;
-            case ModelError.AUTHENTICATION:
-                res = R.string.error_authentication;
-                break;
-            case ModelError.MISSING_PROPERTIES:
-                res = R.string.shop_error_missing_name;
-                break;
-            case ModelError.LIST_COUNT_LIMIT_EXCEEDED:
-                res = R.string.shop_error_count_limit;
-                break;
-            default:
-                res = R.string.error_unknown;
-
-        }
-        parent.showError(res);
+        parent.showError(ModelError.fromRetrofit(error).getResourceMessage());
     }
 
     public void getShopLists(boolean cache) {

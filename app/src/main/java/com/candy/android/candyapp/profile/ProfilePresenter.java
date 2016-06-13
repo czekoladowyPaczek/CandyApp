@@ -135,26 +135,7 @@ public class ProfilePresenter {
                     activity.removeDialog();
                 }, error -> {
                     activity.removeDialog();
-                    ModelError model = ModelError.fromRetrofit(error);
-                    switch (model.getCode()) {
-                        case ModelError.INTERNET_CONNECTION:
-                            activity.showError(R.string.error_connection);
-                            break;
-                        case ModelError.MISSING_PROPERTIES:
-                            activity.showError(R.string.error_internal);
-                            break;
-                        case ModelError.ALREADY_FRIEND:
-                            activity.showError(R.string.error_already_friend);
-                            break;
-                        case ModelError.NO_USER:
-                            activity.showError(R.string.error_no_user);
-                            break;
-                        case ModelError.NOT_INVITED:
-                            activity.showError(R.string.error_not_invited);
-                            break;
-                        default:
-                            activity.showError(R.string.error_unknown);
-                    }
+                    activity.showError(ModelError.fromRetrofit(error).getResourceMessage());
                 });
     }
 

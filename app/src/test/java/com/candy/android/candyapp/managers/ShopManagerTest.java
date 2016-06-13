@@ -115,7 +115,7 @@ public class ShopManagerTest {
     }
 
     @Test
-    public void shouldCreateNewShopListAndSaveOnSuccessWhenRequestWasMadeBefore() {
+    public void shouldCreateNewShopListAndSaveOnSuccessOnFirstPosition() {
         ModelShop shop = ModelShopTest.getModelShop();
         ArrayList<ModelShop> shops = new ArrayList<>(2);
         shops.add(new ModelShop());
@@ -135,7 +135,7 @@ public class ShopManagerTest {
         verify(api).createShopList(eq("Bearer " + TOKEN), captor.capture());
         assertEquals("shop name", captor.getValue().getShopName());
         assertEquals(3, shopsSub.getOnNextEvents().get(0).size());
-        assertEquals(shop.getName(), shopsSub.getOnNextEvents().get(0).get(2).getName());
+        assertEquals(shop.getName(), shopsSub.getOnNextEvents().get(0).get(0).getName());
     }
 
     @Test
