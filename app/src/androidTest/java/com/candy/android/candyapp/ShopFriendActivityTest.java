@@ -102,7 +102,7 @@ public class ShopFriendActivityTest {
     public void assertViewsForOwner() {
         startActivity(ownerList);
 
-        onView(withText(ownerList.getName())).check(matches(isDisplayed()));
+        onView(withText(R.string.users_title)).check(matches(isDisplayed()));
         onView(withId(R.id.add_friend_button)).check(matches(isDisplayed()));
         onView(withText(users.get(0).getName())).check(matches(isDisplayed()));
         onView(withText(users.get(1).getName())).check(matches(isDisplayed()));
@@ -112,7 +112,7 @@ public class ShopFriendActivityTest {
     public void assertViewForUser() {
         startActivity(userList);
 
-        onView(withText(ownerList.getName())).check(matches(isDisplayed()));
+        onView(withText(R.string.users_title)).check(matches(isDisplayed()));
         onView(withId(R.id.add_friend_button)).check(matches(not(isDisplayed())));
         onView(withText(users.get(0).getName())).check(matches(isDisplayed()));
         onView(withText(users.get(1).getName())).check(matches(isDisplayed()));
@@ -130,8 +130,6 @@ public class ShopFriendActivityTest {
         onView(withId(R.id.swipe_refresh)).perform(swipeDown());
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activityRule.getActivity().recreate());
 
-
-        onView(withText(userList.getName())).check(matches(isDisplayed()));
         onView(withId(R.id.add_friend_button)).check(matches(not(isDisplayed())));
         onView(withText(newUsers.get(0).getName())).check(matches(isDisplayed()));
         onView(withText(newUsers.get(1).getName())).check(matches(isDisplayed()));
@@ -157,7 +155,6 @@ public class ShopFriendActivityTest {
         subject.onCompleted();
         SystemClock.sleep(100);
 
-        onView(withText(userList.getName())).check(matches(isDisplayed()));
         onView(withId(R.id.add_friend_button)).check(matches(not(isDisplayed())));
         onView(withText(newUsers.get(0).getName())).check(matches(isDisplayed()));
         onView(withText(newUsers.get(1).getName())).check(matches(isDisplayed()));
@@ -172,7 +169,6 @@ public class ShopFriendActivityTest {
 
         onView(withId(R.id.swipe_refresh)).perform(swipeDown());
 
-        onView(withText(ownerList.getName())).check(matches(isDisplayed()));
         onView(withId(R.id.add_friend_button)).check(matches(isDisplayed()));
         onView(withText(users.get(0).getName())).check(matches(isDisplayed()));
         onView(withText(users.get(1).getName())).check(matches(isDisplayed()));

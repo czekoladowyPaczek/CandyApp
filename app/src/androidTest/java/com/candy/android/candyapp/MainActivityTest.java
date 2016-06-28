@@ -36,7 +36,9 @@ import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static android.support.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
@@ -51,6 +53,7 @@ import static org.mockito.Mockito.when;
 public class MainActivityTest {
 
     private ShopManager manager;
+    private ModelShop shop;
 
     @Rule
     public ActivityTestRule<MainActivity> activityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
@@ -62,7 +65,8 @@ public class MainActivityTest {
         ShopDetailPresenter detailPresenter = new ShopDetailPresenter(manager);
 
         List<ModelShop> shops = new ArrayList<>(1);
-        shops.add(new ModelShop("1", new ModelShopUser(), new ArrayList<>(), "name", Calendar.getInstance().getTime()));
+        shop = new ModelShop("1", new ModelShopUser(), new ArrayList<>(), "name", Calendar.getInstance().getTime());
+        shops.add(shop);
         when(manager.getShopLists(anyBoolean())).thenReturn(Observable.just(shops));
         List<ModelShopItem> items = new ArrayList<>(1);
         when(manager.getShopItems(anyString(), anyBoolean())).thenReturn(Observable.just(items));
@@ -117,6 +121,18 @@ public class MainActivityTest {
 
         activityTestRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
+
+    @Test
+    public void shouldSwitchToUsersView() {
+        switchToDetailView();
+
+        onView(withId(R.id.menu_users)).perform(click());
+
+        onView(withText(R.string.users_title)).check(matches(isDisplayed()));
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click());
+        onView(withText(shop.getName())).check(matches(isDisplayed()));
+    }
+
 //
 //    @Test
 //    public void shouldAddShoppingItem() {

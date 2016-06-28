@@ -11,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.candy.android.candyapp.CandyApplication;
@@ -72,7 +73,8 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
         ButterKnife.bind(this);
         root = findViewById(R.id.root);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(shop.getName());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle(R.string.users_title);
 
         adapter = new UserAdapter<>(this, shop.getUsers(), new ShopUserHolder.Builder(), this);
         manager = new LinearLayoutManager(this);
@@ -106,6 +108,17 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
 
     public void showError(@StringRes int res) {
         Snackbar.make(root, res, Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

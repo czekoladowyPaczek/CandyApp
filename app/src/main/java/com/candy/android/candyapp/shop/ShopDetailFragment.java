@@ -2,6 +2,7 @@ package com.candy.android.candyapp.shop;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -64,6 +65,7 @@ public class ShopDetailFragment extends Fragment {
 
     private ShopAdapter<ShopItemViewHolder> adapter;
     private List<ModelShopItem> items;
+    private ModelShop shop;
 
     private Dialog removingDialog;
 
@@ -96,7 +98,7 @@ public class ShopDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, root);
 
-        ModelShop shop = getArguments().getParcelable(LIST_ID);
+        shop = getArguments().getParcelable(LIST_ID);
 
         AppCompatActivity activity = ((AppCompatActivity) getActivity());
         activity.setSupportActionBar(toolbar);
@@ -136,6 +138,11 @@ public class ShopDetailFragment extends Fragment {
             case R.id.menu_delete:
                 presenter.deleteList();
                 showRemovingDialog();
+                return true;
+            case R.id.menu_users:
+                Intent intent = new Intent(getActivity(), ShopFriendActivity.class);
+                intent.putExtra(ShopFriendActivity.SHOP, shop);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

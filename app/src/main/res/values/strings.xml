@@ -67,4 +67,5 @@
     <string name="detail_deleting_list">Removing list</string>
 
     <string name="friend_retry">Retry</string>
+    <string name="users_title">List users</string>
 </resources>

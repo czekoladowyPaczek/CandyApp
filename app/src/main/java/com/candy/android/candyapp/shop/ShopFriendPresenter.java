@@ -25,7 +25,6 @@ public class ShopFriendPresenter {
     private ShopFriendActivity parent;
 
     private ModelShop shop;
-    private ModelUser user;
 
     private Subscription refreshSub;
     private Observable<ModelShop> refreshObs;
@@ -39,7 +38,7 @@ public class ShopFriendPresenter {
         this.parent = activity;
         this.shop = shop;
 
-        user = userManager.getUser();
+        ModelUser user = userManager.getUser();
 
         parent.showFabButton(shop.isOwner(user.getId()));
 
