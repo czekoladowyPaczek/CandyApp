@@ -6,6 +6,7 @@ import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.model.ModelShop;
+import com.candy.android.candyapp.model.ModelShopUser;
 import com.candy.android.candyapp.model.ModelUser;
 
 import rx.Observable;
@@ -19,15 +20,20 @@ import rx.schedulers.Schedulers;
 
 public class ShopFriendPresenter {
     private static final int RETAIN_REFRESH = 1;
+    private static final int RETAIN_REMOVE = 2;
     private ShopManager shopManager;
     private UserManager userManager;
 
     private ShopFriendActivity parent;
 
     private ModelShop shop;
+    private ModelUser user;
 
     private Subscription refreshSub;
     private Observable<ModelShop> refreshObs;
+
+    private Subscription removeSub;
+    private Observable<ModelShopUser> removeObs;
 
     public ShopFriendPresenter(ShopManager shopManager, UserManager userManager) {
         this.shopManager = shopManager;
@@ -38,7 +44,7 @@ public class ShopFriendPresenter {
         this.parent = activity;
         this.shop = shop;
 
-        ModelUser user = userManager.getUser();
+        user = userManager.getUser();
 
         parent.showFabButton(shop.isOwner(user.getId()));
 
@@ -48,12 +54,20 @@ public class ShopFriendPresenter {
                 refreshSub = subscribeToRefresh(refreshObs);
                 parent.setRefreshing(true);
             }
+            removeObs = retain.get(RETAIN_REMOVE);
+            if (removeObs != null) {
+                removeSub = subscribeToRemove(removeObs);
+                parent.showRemovingProgressDialog();
+            }
         }
     }
 
     public void removeParent() {
         if (refreshSub != null && !refreshSub.isUnsubscribed()) {
             refreshSub.unsubscribe();
+        }
+        if (removeSub != null && !removeSub.isUnsubscribed()) {
+            removeSub.unsubscribe();
         }
     }
 
@@ -63,6 +77,29 @@ public class ShopFriendPresenter {
                 .observeOn(AndroidSchedulers.mainThread())
                 .cache();
         refreshSub = subscribeToRefresh(refreshObs);
+    }
+
+    public SparseArray<Observable> onRetainCustomNonConfigurationInstance() {
+        SparseArray<Observable> retain = new SparseArray<>(1);
+        if (refreshObs != null) {
+            retain.put(RETAIN_REFRESH, refreshObs);
+        }
+        if (removeObs != null) {
+            retain.put(RETAIN_REMOVE, removeObs);
+        }
+        return retain;
+    }
+
+    public boolean isListOwner() {
+        return shop.getOwner().getId() == user.getId();
+    }
+
+    public void removeUser(ModelShopUser user) {
+        removeObs = shopManager.removeFromShop(shop.getId(), user)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .cache();
+        removeSub = subscribeToRemove(removeObs);
     }
 
     private Subscription subscribeToRefresh(Observable<ModelShop> obs) {
@@ -78,11 +115,15 @@ public class ShopFriendPresenter {
         });
     }
 
-    public SparseArray<Observable> onRetainCustomNonConfigurationInstance() {
-        SparseArray<Observable> retain = new SparseArray<>(1);
-        if (refreshObs != null) {
-            retain.put(RETAIN_REFRESH, refreshObs);
-        }
-        return retain;
+    private Subscription subscribeToRemove(Observable<ModelShopUser> obs) {
+        return obs.subscribe(user -> {
+            parent.removeRemovingProgressDialog();
+            parent.removeUserFromList(user);
+            removeObs = null;
+        }, error -> {
+            parent.removeRemovingProgressDialog();
+            parent.showError(ModelError.fromRetrofit(error).getResourceMessage());
+            removeObs = null;
+        });
     }
 }

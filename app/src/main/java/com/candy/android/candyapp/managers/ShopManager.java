@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * @author Marcin
@@ -126,7 +127,7 @@ public class ShopManager {
                 });
     }
 
-    public Observable<Void> removeFromShop(String shopId, ModelFriend friend) {
+    public Observable<ModelShopUser> removeFromShop(String shopId, ModelShopUser friend) {
         ModelShop shop = getShopFromCache(shopId);
         ModelUser user = userManager.getUser();
         if (shop != null) {
@@ -144,7 +145,8 @@ public class ShopManager {
                     if (cachedShop != null) {
                         cachedShop.removeUser(friend.getId());
                     }
-                });
+                })
+                .flatMap((Func1<Void, Observable<ModelShopUser>>) aVoid -> Observable.just(friend));
     }
 
     private ModelShop getShopFromCache(String shopId) {

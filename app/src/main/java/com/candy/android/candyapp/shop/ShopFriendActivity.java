@@ -1,11 +1,13 @@
 package com.candy.android.candyapp.shop;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,11 +19,12 @@ import android.view.View;
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.model.ModelShop;
+import com.candy.android.candyapp.model.ModelShopUser;
 import com.candy.android.candyapp.shop.holder.ShopUserHolder;
 import com.candy.android.candyapp.ui.AdapterClickListener;
 import com.candy.android.candyapp.ui.UserAdapter;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 
@@ -35,6 +38,7 @@ import rx.Observable;
 
 public class ShopFriendActivity extends AppCompatActivity implements AdapterClickListener {
     public static final String SHOP = "com.candy.android.shop";
+    public static final String SELECTED_USER = "com.candy.android.selected_user";
 
     @Inject
     ShopFriendPresenter presenter;
@@ -49,6 +53,10 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
     @BindView(R.id.add_friend_button)
     FloatingActionButton addUser;
 
+    private Dialog acceptDialog;
+    private Dialog removingProgressDialog;
+    private ModelShopUser selectedUser;
+
     private UserAdapter<ShopUserHolder> adapter;
     private LinearLayoutManager manager;
     private ModelShop shop;
@@ -58,14 +66,13 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
             shop = savedInstanceState.getParcelable(SHOP);
+            selectedUser = savedInstanceState.getParcelable(SELECTED_USER);
         } else {
-            shop = getIntent()!= null ? getIntent().getParcelableExtra(SHOP) : null;
+            shop = getIntent() != null ? getIntent().getParcelableExtra(SHOP) : null;
         }
         if (shop == null) {
             finish();
             return;
-        } else {
-            shop = new ModelShop(shop.getId(), shop.getOwner(), new ArrayList<>(shop.getUsers()), shop.getName(), shop.getModificationDate());
         }
 
         setContentView(R.layout.activity_shop_users);
@@ -83,6 +90,11 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
         refreshLayout.setOnRefreshListener(() -> presenter.refreshData());
 
         presenter.setParent(this, shop, getLastCustomNonConfigurationInstance());
+
+        if (selectedUser != null) {
+            acceptDialog = createAcceptDialog(selectedUser);
+            acceptDialog.show();
+        }
     }
 
     public void onDataRefresh(ModelShop shop) {
@@ -110,6 +122,40 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
         Snackbar.make(root, res, Snackbar.LENGTH_LONG).show();
     }
 
+    public void showRemovingProgressDialog() {
+        removingProgressDialog = new AlertDialog.Builder(this)
+                .setMessage(R.string.users_removing_user)
+                .setCancelable(false)
+                .create();
+        removingProgressDialog.show();
+    }
+
+    public void removeRemovingProgressDialog() {
+        if (removingProgressDialog != null && removingProgressDialog.isShowing()) {
+            try {
+                removingProgressDialog.dismiss();
+            } catch (IllegalArgumentException ignored) {
+
+            }
+        }
+    }
+
+    public void removeUserFromList(ModelShopUser user) {
+        int position = 0;
+        int userPosition = -1;
+        for (Iterator<ModelShopUser> it = shop.getUsers().iterator(); it.hasNext(); position++) {
+            final ModelShopUser u = it.next();
+            if (u.getId() == user.getId()) {
+                it.remove();
+                userPosition = position;
+                break;
+            }
+        }
+        if (userPosition > -1) {
+            adapter.notifyItemRemoved(userPosition);
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -125,6 +171,8 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(SHOP, shop);
+        if (selectedUser != null)
+            outState.putParcelable(SELECTED_USER, selectedUser);
     }
 
     @Override
@@ -141,11 +189,50 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
     @Override
     protected void onDestroy() {
         presenter.removeParent();
+        removeAcceptDialog();
+        removeRemovingProgressDialog();
         super.onDestroy();
     }
 
     @Override
     public void onClick(int position) {
+        if (!presenter.isListOwner()) {
+            return;
+        }
 
+        ModelShopUser user = shop.getUsers().get(position);
+        if (user.getId() != shop.getOwner().getId()) {
+            selectedUser = user;
+            acceptDialog = createAcceptDialog(selectedUser);
+            acceptDialog.show();
+        } else {
+            showError(R.string.users_error_remove_owner);
+        }
+    }
+
+    private void removeAcceptDialog() {
+        if (acceptDialog != null && acceptDialog.isShowing()) {
+            try {
+                acceptDialog.dismiss();
+            } catch (IllegalArgumentException ignored) {
+
+            }
+        }
+    }
+
+    private AlertDialog createAcceptDialog(ModelShopUser selectedUser) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.users_remove_title, selectedUser.getName()));
+        builder.setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            showRemovingProgressDialog();
+            presenter.removeUser(selectedUser);
+        });
+        builder.setOnDismissListener(dialog -> {
+            ShopFriendActivity.this.selectedUser = null;
+            acceptDialog = null;
+        });
+        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+        });
+        return builder.create();
     }
 }

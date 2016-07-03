@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 import retrofit2.adapter.rxjava.HttpException;
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -438,8 +436,8 @@ public class ShopManagerTest {
     public void removeFromShop_shouldCallApiAndRemoveUserFromCache() {
         when(api.removeFromList(anyString(), any(RequestShopUser.class))).thenReturn(Observable.just(null));
 
-        TestSubscriber<Void> sub = new TestSubscriber<>();
-        manager.removeFromShop("1", new ModelFriend(2, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+        TestSubscriber<ModelShopUser> sub = new TestSubscriber<>();
+        manager.removeFromShop("1", new ModelShopUser(2, "", "")).subscribe(sub);
 
         sub.assertNoErrors();
         ArgumentCaptor<RequestShopUser> argument = ArgumentCaptor.forClass(RequestShopUser.class);
@@ -453,8 +451,8 @@ public class ShopManagerTest {
         when(userManager.getUser()).thenReturn(getUser());
         insertShopListsToCache();
 
-        TestSubscriber<Void> sub = new TestSubscriber<>();
-        manager.removeFromShop("2", new ModelFriend(2, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+        TestSubscriber<ModelShopUser> sub = new TestSubscriber<>();
+        manager.removeFromShop("2", new ModelShopUser(2, "", "")).subscribe(sub);
 
         sub.assertError(HttpException.class);
         assertEquals(ModelError.NOT_PERMITTED, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
@@ -466,8 +464,8 @@ public class ShopManagerTest {
         when(userManager.getUser()).thenReturn(getUser());
         insertShopListsToCache();
 
-        TestSubscriber<Void> sub = new TestSubscriber<>();
-        manager.removeFromShop("1", new ModelFriend(3, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+        TestSubscriber<ModelShopUser> sub = new TestSubscriber<>();
+        manager.removeFromShop("1", new ModelShopUser(3, "", "")).subscribe(sub);
 
         sub.assertError(HttpException.class);
         assertEquals(ModelError.USER_IS_NOT_INVITED, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
@@ -479,14 +477,15 @@ public class ShopManagerTest {
         when(userManager.getUser()).thenReturn(getUser());
         insertShopListsToCache();
 
-        TestSubscriber<Void> sub = new TestSubscriber<>();
-        manager.removeFromShop("1", new ModelFriend(1, "", "", ModelFriend.STATUS_ACCEPTED)).subscribe(sub);
+        TestSubscriber<ModelShopUser> sub = new TestSubscriber<>();
+        manager.removeFromShop("1", new ModelShopUser(1, "", "")).subscribe(sub);
 
         sub.assertError(HttpException.class);
         assertEquals(ModelError.CANNOT_REMOVE_OWNER, ModelError.fromRetrofit(sub.getOnErrorEvents().get(0)));
         verify(api, never()).inviteToList(anyString(), any(RequestShopUser.class));
     }
 
+    @Test
     public void removeShopList_shouldCallApiAndNotRemoveFromCacheIfDifferentErrorOccurred() {
         List<ModelShop> shops = new ArrayList<>();
         shops.add(ModelShopTest.getModelShop());

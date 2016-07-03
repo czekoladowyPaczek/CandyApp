@@ -67,5 +67,9 @@
     <string name="detail_deleting_list">Removing list</string>
 
     <string name="friend_retry">Retry</string>
+
     <string name="users_title">List users</string>
+    <string name="users_error_remove_owner">Cannot remove owner</string>
+    <string name="users_remove_title">Do you want to remove %s from list?</string>
+    <string name="users_removing_user">Removing user</string>
 </resources>
