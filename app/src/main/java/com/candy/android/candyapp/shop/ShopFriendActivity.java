@@ -58,7 +58,6 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
     private ModelShopUser selectedUser;
 
     private UserAdapter<ShopUserHolder> adapter;
-    private LinearLayoutManager manager;
     private ModelShop shop;
 
     @Override
@@ -84,8 +83,7 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
         getSupportActionBar().setTitle(R.string.users_title);
 
         adapter = new UserAdapter<>(this, shop.getUsers(), new ShopUserHolder.Builder(), this);
-        manager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(manager);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         refreshLayout.setOnRefreshListener(() -> presenter.refreshData());
 
@@ -231,8 +229,7 @@ public class ShopFriendActivity extends AppCompatActivity implements AdapterClic
             ShopFriendActivity.this.selectedUser = null;
             acceptDialog = null;
         });
-        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {
-        });
+        builder.setNegativeButton(android.R.string.cancel, (dialog, which) -> {});
         return builder.create();
     }
 }
