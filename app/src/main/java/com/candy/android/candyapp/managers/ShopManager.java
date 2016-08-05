@@ -60,7 +60,6 @@ public class ShopManager {
             return Observable.concat(memoryStorage.getShop(shopId), network)
                     .first();
         }
-
         return network;
     }
 
@@ -128,7 +127,6 @@ public class ShopManager {
                     } else if (shop.isOwner(friend.getId())) {
                         return Observable.error(ModelError.generateError(ModelError.CANNOT_REMOVE_OWNER));
                     }
-                    int x = 1;
                     return Observable.just(shop);
                 })
                 .flatMap(shop -> api.removeFromList(getToken(), new RequestShopUser(shopId, friend.getId()))
@@ -137,25 +135,6 @@ public class ShopManager {
                             memoryStorage.updateShop(shop);
                         }))
                 .flatMap(aVoid -> Observable.just(friend)));
-//        ModelShop shop = getShopFromCache(shopId);
-//        ModelUser user = userManager.getUser();
-//        if (shop != null) {
-//            if (!shop.isOwner(user.getId())) {
-//                return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
-//            } else if (!shop.isInvited(friend.getId())) {
-//                return Observable.error(ModelError.generateError(ModelError.USER_IS_NOT_INVITED));
-//            } else if (shop.isOwner(friend.getId())) {
-//                return Observable.error(ModelError.generateError(ModelError.CANNOT_REMOVE_OWNER));
-//            }
-//        }
-//        return api.removeFromList(getToken(), new RequestShopUser(shopId, friend.getId()))
-//                .doOnNext(v -> {
-////                    ModelShop cachedShop = getShopFromCache(shopId);
-////                    if (cachedShop != null) {
-////                        cachedShop.removeUser(friend.getId());
-////                    }
-//                })
-//                .flatMap(aVoid -> Observable.just(friend));
     }
 
     private String getToken() {

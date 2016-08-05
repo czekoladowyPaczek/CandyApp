@@ -457,15 +457,4 @@ public class ShopManagerTest {
         users.add(new ModelShopUser(2, "name 2", ""));
         return new ModelShop("2", users.get(1), users, "list 2", Calendar.getInstance().getTime());
     }
-
-    private void insertShopListsToCache() {
-        List<ModelShopUser> users = new ArrayList<>(2);
-        users.add(new ModelShopUser(1, "name 1", ""));
-        users.add(new ModelShopUser(2, "name 2", ""));
-        List<ModelShop> shops = new ArrayList<>(2);
-        shops.add(new ModelShop("1", users.get(0), users, "list 1", Calendar.getInstance().getTime()));
-        shops.add(new ModelShop("2", users.get(1), users, "list 2", Calendar.getInstance().getTime()));
-        when(api.getShopLists(anyString())).thenReturn(Observable.just(shops));
-        manager.getShopLists(false).subscribe(new TestSubscriber<>());
-    }
 }
