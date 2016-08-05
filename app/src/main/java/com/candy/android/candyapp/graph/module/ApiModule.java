@@ -3,6 +3,7 @@ package com.candy.android.candyapp.graph.module;
 import android.content.Context;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.storage.ShopMemoryStorage;
 import com.candy.android.candyapp.storage.UserStorage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -50,5 +51,11 @@ public class ApiModule {
     @Provides
     UserStorage provideUserStorage() {
         return new UserStorage(context);
+    }
+
+    @Provides
+    @Singleton
+    ShopMemoryStorage shopMemoryStorage() {
+        return new ShopMemoryStorage();
     }
 }

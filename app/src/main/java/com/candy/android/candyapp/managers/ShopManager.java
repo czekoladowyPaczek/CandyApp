@@ -10,16 +10,11 @@ import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
 import com.candy.android.candyapp.model.ModelShopUser;
 import com.candy.android.candyapp.model.ModelUser;
-import com.candy.android.zlog.ZLog;
+import com.candy.android.candyapp.storage.ShopMemoryStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * @author Marcin
@@ -28,172 +23,139 @@ import rx.functions.Func1;
 public class ShopManager {
     private UserManager userManager;
     private CandyApi api;
+    private ShopMemoryStorage memoryStorage;
 
-    private List<ModelShop> shops;
-    private Map<String, List<ModelShopItem>> items;
-
-    public ShopManager(UserManager userManager, CandyApi api) {
+    public ShopManager(UserManager userManager, CandyApi api, ShopMemoryStorage memoryStorage) {
         this.userManager = userManager;
         this.api = api;
-
-        items = new HashMap<>();
+        this.memoryStorage = memoryStorage;
     }
 
     public void logout() {
-        this.shops = null;
-        this.items.clear();
+        memoryStorage.clearData();
     }
 
     public Observable<List<ModelShop>> getShopLists(boolean cache) {
-        if (shops != null && cache) {
-            return Observable.just(shops);
+        Observable<List<ModelShop>> network = Observable.defer(() -> api.getShopLists(getToken())
+                .doOnNext(memoryStorage::setShops));
+
+        if (cache) {
+            return Observable.concat(memoryStorage.getShops(), network)
+                    .first();
         } else {
-            return api.getShopLists(getToken())
-                    .doOnNext(shops -> this.shops = shops);
+            return network;
         }
     }
 
     public Observable<ModelShop> getShopList(String shopId, boolean cache) {
-        ModelShop cachedShop = null;
+        Observable<ModelShop> network = Observable.defer(() -> api.getShopList(getToken(), shopId)
+                .doOnNext(memoryStorage::addShop)
+                .doOnError(error -> {
+                    if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
+                        memoryStorage.removeShop(shopId);
+                    }
+                }));
+
         if (cache) {
-            cachedShop = getShopFromCache(shopId);
+            return Observable.concat(memoryStorage.getShop(shopId), network)
+                    .first();
         }
 
-        if (cachedShop != null) {
-            return Observable.just(cachedShop);
-        } else {
-            return api.getShopList(getToken(), shopId)
-                    .doOnNext(this::addShopToCache)
-                    .doOnError(error -> {
-                        if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
-                            removeShopFromCache(shopId);
-                        }
-                    });
-        }
+        return network;
     }
 
     public Observable<ModelShop> createShopList(String name) {
         return api.createShopList(getToken(), new RequestCreateShopList(name))
-                .doOnNext(this::addShopToCache);
+                .doOnNext(memoryStorage::addShop);
     }
 
     public Observable<ModelResponseSimple> removeShopList(String id) {
         return api.deleteShopList(getToken(), id)
-                .doOnNext(response -> {
-                    removeShopFromCache(id);
-                    if (items.containsKey(id)) {
-                        items.remove(id);
-                    }
-                })
+                .doOnNext(response -> memoryStorage.removeShop(id))
                 .doOnError(error -> {
                     if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
-                        removeShopFromCache(id);
+
+                        memoryStorage.removeShop(id);
                     }
                 });
     }
 
     public Observable<List<ModelShopItem>> getShopItems(String id, boolean cache) {
-        if (cache && items.containsKey(id)) {
-            return Observable.just(items.get(id));
-        } else {
-            return api.getItems(getToken(), id)
-                    .doOnNext(items -> this.items.put(id, items))
-                    .doOnError(error -> {
-                        if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
-                            removeShopFromCache(id);
-                        }
-                    });
+        Observable<List<ModelShopItem>> network = Observable.defer(() -> api.getItems(getToken(), id)
+                .doOnNext(items -> memoryStorage.setShopItems(id, items))
+                .doOnError(error -> {
+                    if (ModelError.fromRetrofit(error).getCode() == ModelError.LIST_NOT_EXIST.getCode()) {
+                        memoryStorage.removeShop(id);
+                    }
+                }));
+
+        if (cache) {
+            return Observable.concat(memoryStorage.getShopItems(id), network)
+                    .first();
         }
+
+        return network;
     }
 
     public Observable<Void> inviteToShop(String shopId, ModelFriend friend) {
-        ModelShop cachedShop = getShopFromCache(shopId);
-        ModelUser currentUser = userManager.getUser();
-        if (cachedShop != null) {
-            if (!cachedShop.isOwner(currentUser.getId())) {
-                return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
-            } else if (cachedShop.isInvited(friend.getId())) {
-                return Observable.error(ModelError.generateError(ModelError.ALREADY_INVITED));
-            } else if (!currentUser.isFriend(friend.getId())) {
-                return Observable.error(ModelError.generateError(ModelError.NOT_ON_FRIEND_LIST));
-            }
-        }
-        return api.inviteToList(getToken(), new RequestShopUser(shopId, friend.getId()))
-                .doOnNext(v -> {
-                    ModelShop shop = getShopFromCache(shopId);
-                    if (shop != null) {
-                        shop.getUsers().add(new ModelShopUser(friend.getId(), friend.getName(), friend.getPicture()));
+        return Observable.defer(() -> memoryStorage.getShop(shopId)
+                .flatMap(cachedShop -> {
+                    ModelUser currentUser = userManager.getUser();
+                    if (!cachedShop.isOwner(currentUser.getId())) {
+                        return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
+                    } else if (cachedShop.isInvited(friend.getId())) {
+                        return Observable.error(ModelError.generateError(ModelError.ALREADY_INVITED));
+                    } else if (!currentUser.isFriend(friend.getId())) {
+                        return Observable.error(ModelError.generateError(ModelError.NOT_ON_FRIEND_LIST));
                     }
-                });
+                    return Observable.just(cachedShop);
+                })
+                .flatMap(cachedShop -> api.inviteToList(getToken(), new RequestShopUser(shopId, friend.getId()))
+                        .doOnNext(v -> {
+                            cachedShop.getUsers().add(new ModelShopUser(friend.getId(), friend.getName(), friend.getPicture()));
+                            memoryStorage.updateShop(cachedShop);
+                        })));
     }
 
     public Observable<ModelShopUser> removeFromShop(String shopId, ModelShopUser friend) {
-        ModelShop shop = getShopFromCache(shopId);
-        ModelUser user = userManager.getUser();
-        if (shop != null) {
-            if (!shop.isOwner(user.getId())) {
-                return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
-            } else if (!shop.isInvited(friend.getId())) {
-                return Observable.error(ModelError.generateError(ModelError.USER_IS_NOT_INVITED));
-            } else if (shop.isOwner(friend.getId())) {
-                return Observable.error(ModelError.generateError(ModelError.CANNOT_REMOVE_OWNER));
-            }
-        }
-        return api.removeFromList(getToken(), new RequestShopUser(shopId, friend.getId()))
-                .doOnNext(v -> {
-                    ModelShop cachedShop = getShopFromCache(shopId);
-                    if (cachedShop != null) {
-                        cachedShop.removeUser(friend.getId());
+        return Observable.defer(() -> memoryStorage.getShop(shopId)
+                .flatMap(shop -> {
+                    ModelUser user = userManager.getUser();
+                    if (!shop.isOwner(user.getId())) {
+                        return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
+                    } else if (!shop.isInvited(friend.getId())) {
+                        return Observable.error(ModelError.generateError(ModelError.USER_IS_NOT_INVITED));
+                    } else if (shop.isOwner(friend.getId())) {
+                        return Observable.error(ModelError.generateError(ModelError.CANNOT_REMOVE_OWNER));
                     }
+                    int x = 1;
+                    return Observable.just(shop);
                 })
-                .flatMap((Func1<Void, Observable<ModelShopUser>>) aVoid -> Observable.just(friend));
-    }
-
-    private ModelShop getShopFromCache(String shopId) {
-        if (shops != null) {
-            for (ModelShop shop : shops) {
-                if (shop.getId().equals(shopId)) {
-                    return shop;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void addShopToCache(ModelShop shop) {
-        if (shops == null) {
-            shops = new ArrayList<>();
-        }
-        int existingPosition = -1;
-        for (int i = 0; i < shops.size(); i++) {
-            if (shops.get(i).getId().equals(shop.getId())) {
-                existingPosition = i;
-                break;
-            }
-        }
-        if (existingPosition > -1) {
-            shops.remove(existingPosition);
-            shops.add(existingPosition, shop);
-        } else {
-            shops.add(0, shop);
-        }
-    }
-
-    private void removeShopFromCache(String id) {
-        if (shops != null) {
-            ZLog.e("remove " + id);
-            Iterator<ModelShop> shopIterator = shops.iterator();
-            while (shopIterator.hasNext()) {
-                final ModelShop shop = shopIterator.next();
-                if (shop.getId().equals(id)) {
-                    shopIterator.remove();
-                    break;
-                }
-            }
-        }
-        if (items.containsKey(id)) {
-            items.remove(id);
-        }
+                .flatMap(shop -> api.removeFromList(getToken(), new RequestShopUser(shopId, friend.getId()))
+                        .doOnNext(v -> {
+                            shop.removeUser(friend.getId());
+                            memoryStorage.updateShop(shop);
+                        }))
+                .flatMap(aVoid -> Observable.just(friend)));
+//        ModelShop shop = getShopFromCache(shopId);
+//        ModelUser user = userManager.getUser();
+//        if (shop != null) {
+//            if (!shop.isOwner(user.getId())) {
+//                return Observable.error(ModelError.generateError(ModelError.NOT_PERMITTED));
+//            } else if (!shop.isInvited(friend.getId())) {
+//                return Observable.error(ModelError.generateError(ModelError.USER_IS_NOT_INVITED));
+//            } else if (shop.isOwner(friend.getId())) {
+//                return Observable.error(ModelError.generateError(ModelError.CANNOT_REMOVE_OWNER));
+//            }
+//        }
+//        return api.removeFromList(getToken(), new RequestShopUser(shopId, friend.getId()))
+//                .doOnNext(v -> {
+////                    ModelShop cachedShop = getShopFromCache(shopId);
+////                    if (cachedShop != null) {
+////                        cachedShop.removeUser(friend.getId());
+////                    }
+//                })
+//                .flatMap(aVoid -> Observable.just(friend));
     }
 
     private String getToken() {
