@@ -65,7 +65,7 @@ public class ShopFriendActivityTest {
 
     private ModelUser user;
     private ModelShop ownerList;
-    private ModelShop userList;
+    private ModelShop notOwnerList;
     private List<ModelShopUser> users;
 
     private ShopManager shopManager;
@@ -82,7 +82,7 @@ public class ShopFriendActivityTest {
         users.add(new ModelShopUser(1, "name 1", ""));
         users.add(new ModelShopUser(2, "name 2", ""));
         ownerList = new ModelShop("1", users.get(0), users, "name list", Calendar.getInstance().getTime());
-        userList = new ModelShop("2", users.get(1), users, "name list", Calendar.getInstance().getTime());
+        notOwnerList = new ModelShop("2", users.get(1), users, "name list", Calendar.getInstance().getTime());
 
         shopManager = Mockito.mock(ShopManager.class);
     }
@@ -131,7 +131,7 @@ public class ShopFriendActivityTest {
 
     @Test
     public void assertViewForUser() {
-        startActivity(userList);
+        startActivity(notOwnerList);
 
         onView(withText(R.string.users_title)).check(matches(isDisplayed()));
         onView(withId(R.id.add_friend_button)).check(matches(not(isDisplayed())));
@@ -141,12 +141,12 @@ public class ShopFriendActivityTest {
 
     @Test
     public void shouldRefreshListAndKeepNewValuesAfterRecreate() {
-        startActivity(userList);
+        startActivity(notOwnerList);
         List<ModelShopUser> newUsers = new ArrayList<>(3);
-        newUsers.addAll(userList.getUsers());
+        newUsers.addAll(notOwnerList.getUsers());
         newUsers.add(new ModelShopUser(4, "name 4", ""));
-        ModelShop newShopList = new ModelShop(userList.getId(), newUsers.get(0), newUsers, "name new", Calendar.getInstance().getTime());
-        when(shopManager.getShopList(userList.getId(), false)).thenReturn(Observable.just(newShopList));
+        ModelShop newShopList = new ModelShop(notOwnerList.getId(), newUsers.get(0), newUsers, "name new", Calendar.getInstance().getTime());
+        when(shopManager.getShopList(notOwnerList.getId(), false)).thenReturn(Observable.just(newShopList));
 
         onView(withId(R.id.swipe_refresh)).perform(ViewActions.swipeDown());
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> activityRule.getActivity().recreate());
@@ -159,24 +159,33 @@ public class ShopFriendActivityTest {
 
     @Test
     public void shouldResubscribeToPendingRefreshRequestAfterRecreate() {
-        startActivity(userList);
+        startActivity(notOwnerList);
         List<ModelShopUser> newUsers = new ArrayList<>(3);
-        newUsers.addAll(userList.getUsers());
+        newUsers.addAll(notOwnerList.getUsers());
         newUsers.add(new ModelShopUser(4, "name 4", ""));
-        ModelShop newShopList = new ModelShop(userList.getId(), newUsers.get(0), newUsers, "name new", Calendar.getInstance().getTime());
+        ModelShop newShopList = new ModelShop(notOwnerList.getId(), newUsers.get(0), newUsers, "name new", Calendar.getInstance().getTime());
         PublishSubject<ModelShop> subject = PublishSubject.create();
-        when(shopManager.getShopList(userList.getId(), false)).thenReturn(subject.asObservable());
+        when(shopManager.getShopList(notOwnerList.getId(), false)).thenReturn(subject.asObservable());
+
+        idlingResource = new SubjectIdlingResource(subject.asObservable());
+        Espresso.registerIdlingResources(idlingResource);
+
         InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
             presenter.refreshData();
             activityRule.getActivity().recreate();
         });
 
-        idlingResource = new SubjectIdlingResource(subject.asObservable());
-        Espresso.registerIdlingResources(idlingResource);
-        subject.onNext(newShopList);
-        subject.onCompleted();
+        Thread th = new Thread(() -> {
+                try {
+                    Thread.sleep(500); // let activity to be recreated before posting event
+                } catch (InterruptedException ignored) {
 
-        onView(withId(R.id.add_friend_button)).check(matches(not(isDisplayed())));
+                }
+                subject.onNext(newShopList);
+                subject.onCompleted();
+        });
+        th.run();
+
         onView(withText(newUsers.get(0).getName())).check(matches(isDisplayed()));
         onView(withText(newUsers.get(1).getName())).check(matches(isDisplayed()));
         onView(withText(newUsers.get(2).getName())).check(matches(isDisplayed()));
@@ -198,10 +207,10 @@ public class ShopFriendActivityTest {
 
     @Test
     public void onListCLicked_shouldNotShowRemoveDialogAfterOnListClickIfUserIsNotListOwner() {
-        startActivity(userList);
+        startActivity(notOwnerList);
 
         onView(withId(R.id.shop_users_list)).perform(RecyclerViewActions.actionOnItemAtPosition(0, click()));
-        onView(withText(getString(R.string.users_remove_title, userList.getUsers().get(0).getName()))).check(doesNotExist());
+        onView(withText(getString(R.string.users_remove_title, notOwnerList.getUsers().get(0).getName()))).check(doesNotExist());
         onView(withText(R.string.users_error_remove_owner)).check(doesNotExist());
     }
 
