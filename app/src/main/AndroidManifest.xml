@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.candy.android.candyapp">
+<manifest package="com.candy.android.candyapp"
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:name=".CandyApplication"
         android:allowBackup="false"
@@ -14,27 +14,28 @@
         tools:replace="android:allowBackup">
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_id" />
+            android:value="@string/facebook_id"/>
 
         <activity android:name=".login.LoginActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".profile.ProfileActivity" />
-        <activity android:name=".shop.ShopFriendActivity" />
+        <activity android:name=".MainActivity"/>
+        <activity android:name=".profile.ProfileActivity"/>
+        <activity android:name=".shop.ShopFriendActivity"/>
+        <activity android:name=".shop.AddItemActivity"/>
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"
-            android:value="c6b9bff1c6f74c49240e8f3e9d0bce955eeef363" />
+            android:value="c6b9bff1c6f74c49240e8f3e9d0bce955eeef363"/>
     </application>
 
 </manifest>

@@ -94,8 +94,9 @@ public class ShopDetailFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
         ButterKnife.bind(this, root);
 
         shop = getArguments().getParcelable(LIST_ID);
@@ -111,6 +112,8 @@ public class ShopDetailFragment extends Fragment {
         shopList.setLayoutManager(new LinearLayoutManager(getContext()));
         shopList.setAdapter(adapter);
         refreshLayout.setOnRefreshListener(() -> presenter.getShopListItems(false));
+
+        createShopButton.setOnClickListener(v -> startActivity(new Intent(getContext(), AddItemActivity.class)));
 
         presenter.setParent(shop.getId(), this);
     }

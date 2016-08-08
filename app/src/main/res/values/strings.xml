@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Candy App</string>
     <string name="facebook_id" translatable="false">1683017735281219</string>
+    <string name="imgur_id" translatable="false">f6b95273d1d7f1d</string>
 
     <string name="error_connection">No internet connection</string>
     <string name="error_authentication">Authentication error</string>
@@ -72,4 +73,17 @@
     <string name="users_error_remove_owner">Cannot remove owner</string>
     <string name="users_remove_title">Do you want to remove %s from list?</string>
     <string name="users_removing_user">Removing user</string>
+
+    <string name="shop_create_name_hint">Item name</string>
+    <string name="shop_create_name_error">Provide item name</string>
+    <string name="shop_create_quantity_hint">Quantity</string>
+    <string name="shop_create_quantity_error">Provide quantity</string>
+    <string-array name="shop_create_quantity_type">
+        <item>pieces</item>
+        <item>grams</item>
+        <item>kilograms</item>
+        <item>milliliters</item>
+        <item>liters</item>
+    </string-array>
+    <string name="shop_create_save">Save</string>
 </resources>
