@@ -3,6 +3,7 @@ package com.candy.android.candyapp.graph.module;
 import android.content.Context;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.ImgurApi;
 import com.candy.android.candyapp.storage.ShopMemoryStorage;
 import com.candy.android.candyapp.storage.UserStorage;
 import com.google.gson.Gson;
@@ -32,9 +33,6 @@ public class ApiModule {
     @Provides
     @Singleton
     CandyApi provideCandyApi() {
-        Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                .create();
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
@@ -42,10 +40,32 @@ public class ApiModule {
         Retrofit retrofit = new Retrofit.Builder()
                 .client(client)
                 .baseUrl(CandyApi.ENDPOINT)
-                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(GsonConverterFactory.create(getGson()))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
         return retrofit.create(CandyApi.class);
+    }
+
+    @Provides
+    @Singleton
+    ImgurApi imgurApi() {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(client)
+                .baseUrl(ImgurApi.URL)
+                .addConverterFactory(GsonConverterFactory.create(getGson()))
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+        return retrofit.create(ImgurApi.class);
+    }
+
+    private Gson getGson() {
+        return new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+                .create();
     }
 
     @Provides
