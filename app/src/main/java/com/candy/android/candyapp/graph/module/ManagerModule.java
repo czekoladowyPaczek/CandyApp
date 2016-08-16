@@ -1,6 +1,8 @@
 package com.candy.android.candyapp.graph.module;
 
 import com.candy.android.candyapp.api.CandyApi;
+import com.candy.android.candyapp.api.ImgurApi;
+import com.candy.android.candyapp.managers.ImageUploadManager;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.storage.ShopMemoryStorage;
@@ -27,5 +29,11 @@ public class ManagerModule {
     @Singleton
     public ShopManager provideShopManager(CandyApi api, UserManager manager, ShopMemoryStorage memory) {
         return new ShopManager(manager, api, memory);
+    }
+
+    @Provides
+    @Singleton
+    public ImageUploadManager imageUploadManager(ImgurApi api) {
+        return new ImageUploadManager(api);
     }
 }

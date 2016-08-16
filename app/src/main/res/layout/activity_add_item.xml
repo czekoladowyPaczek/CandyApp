@@ -18,25 +18,38 @@
             layout="@layout/view_toolbar"/>
     </android.support.design.widget.AppBarLayout>
 
-    <ImageView
-        android:id="@+id/item_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+    <FrameLayout
+        android:id="@+id/item_image_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/toolbar_layout"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="-20dp"
-        android:foreground="@drawable/item_image"
-        android:src="@drawable/item_image_default"/>
+        android:layout_marginTop="-20dp">
+
+        <ImageView
+            android:id="@+id/item_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:foreground="@drawable/item_image"
+            android:src="@drawable/item_image_default"/>
+
+        <ProgressBar
+            android:id="@+id/item_image_saving"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+    </FrameLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/item_name_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/item_image"
         android:layout_alignParentRight="true"
+        android:layout_below="@id/toolbar_layout"
         android:layout_marginRight="16dp"
-        android:layout_toRightOf="@id/item_image">
+        android:layout_toRightOf="@id/item_image_layout">
 
         <android.support.design.widget.TextInputEditText
             android:id="@+id/item_name"
@@ -48,7 +61,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/item_image"
+        android:layout_below="@id/item_image_layout"
         android:layout_margin="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
@@ -64,7 +77,8 @@
                 android:id="@+id/item_quantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/shop_create_quantity_hint"/>
+                android:hint="@string/shop_create_quantity_hint"
+                android:inputType="number"/>
         </android.support.design.widget.TextInputLayout>
 
         <Spinner

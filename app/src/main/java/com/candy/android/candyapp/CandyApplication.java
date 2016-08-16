@@ -5,6 +5,7 @@ import android.app.Application;
 import com.candy.android.candyapp.graph.component.ActivityComponent;
 import com.candy.android.candyapp.graph.component.DaggerActivityComponent;
 import com.candy.android.candyapp.graph.module.ApiModule;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.zlog.ZLog;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
@@ -40,6 +41,7 @@ public class CandyApplication extends Application {
 
         activityComponent = DaggerActivityComponent.builder()
                 .apiModule(new ApiModule(this))
+                .utilModule(new UtilModule(this))
                 .build();
 
         app = this;

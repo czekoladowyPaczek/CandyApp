@@ -48,11 +48,12 @@ public class LoginActivityTest {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         CandyApplication app = (CandyApplication) instrumentation.getTargetContext().getApplicationContext();
         app.setActivityComponent(component);
+
+        activityRule.launchActivity(new Intent());
     }
 
     @Test
     public void viewsVisiblePortrait() {
-        activityRule.launchActivity(new Intent());
         onView(withId(R.id.iconBig)).check(matches(isDisplayed()));
         onView(withText(R.string.login_welcome)).check(matches(isDisplayed()));
         onView(withId(R.id.loginButton)).check(matches(isDisplayed()));
@@ -60,7 +61,6 @@ public class LoginActivityTest {
 
     @Test
     public void viewsVisibleLandscape() {
-        activityRule.launchActivity(new Intent());
         activityRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         onView(withId(R.id.iconBig)).check(matches(isDisplayed()));
         onView(withText(R.string.login_welcome)).check(matches(isDisplayed()));

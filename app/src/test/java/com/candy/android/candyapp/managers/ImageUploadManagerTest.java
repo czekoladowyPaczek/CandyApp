@@ -20,7 +20,6 @@ import static org.mockito.Mockito.when;
  * @author Marcin
  */
 public class ImageUploadManagerTest {
-    private String clientId = "123";
     private ImageUploadManager manager;
     @Mock
     private ImgurApi api;
@@ -28,7 +27,7 @@ public class ImageUploadManagerTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        manager = new ImageUploadManager(clientId, api);
+        manager = new ImageUploadManager(api);
     }
 
     @Test
@@ -37,6 +36,6 @@ public class ImageUploadManagerTest {
 
         manager.uploadImage("test_path");
 
-        verify(api).postImage(eq("Client-ID " + clientId), any(RequestBody.class));
+        verify(api).postImage(eq("Client-ID " + ImageUploadManager.CLIENT_ID), any(RequestBody.class));
     }
 }

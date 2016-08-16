@@ -4,6 +4,7 @@ import com.candy.android.candyapp.graph.module.ApiModule;
 import com.candy.android.candyapp.graph.module.FacebookModule;
 import com.candy.android.candyapp.graph.module.ManagerModule;
 import com.candy.android.candyapp.graph.module.PresenterModule;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.login.LoginFragment;
 import com.candy.android.candyapp.profile.ProfileActivity;
@@ -20,7 +21,7 @@ import dagger.Component;
  * @author Marcin
  */
 @Singleton
-@Component(modules = {PresenterModule.class, FacebookModule.class, ManagerModule.class, ApiModule.class})
+@Component(modules = {PresenterModule.class, FacebookModule.class, ManagerModule.class, ApiModule.class, UtilModule.class})
 public interface ActivityComponent {
     void inject(LoginActivity activity);
     void inject(LoginFragment fragment);

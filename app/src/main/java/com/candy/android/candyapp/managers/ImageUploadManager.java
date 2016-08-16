@@ -14,15 +14,14 @@ import rx.Observable;
  */
 public class ImageUploadManager {
     private static final String AUTHENTICATION = "Client-ID ";
-    private String clientId;
+    public static final String CLIENT_ID = "f6b95273d1d7f1d";
     private ImgurApi api;
 
-    public ImageUploadManager(String clientId, ImgurApi api) {
+    public ImageUploadManager(ImgurApi api) {
         this.api = api;
-        this.clientId = clientId;
     }
 
     public Observable<UploadedImage> uploadImage(String path) {
-        return api.postImage(AUTHENTICATION + clientId, RequestBody.create(MediaType.parse("image/*"), new File(path)));
+        return api.postImage(AUTHENTICATION + CLIENT_ID, RequestBody.create(MediaType.parse("image/*"), new File(path)));
     }
 }
