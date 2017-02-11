@@ -112,6 +112,8 @@ public class ShopDetailFragment extends Fragment {
         shopList.setAdapter(adapter);
         refreshLayout.setOnRefreshListener(() -> presenter.getShopListItems(false));
 
+        createShopButton.setOnClickListener(v -> startActivity(new Intent(getContext(), AddItemActivity.class)));
+
         presenter.setParent(shop.getId(), this);
     }
 

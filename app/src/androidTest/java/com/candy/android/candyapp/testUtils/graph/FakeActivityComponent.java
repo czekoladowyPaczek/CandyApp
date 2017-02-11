@@ -14,7 +14,7 @@ import dagger.Component;
  * @author Marcin
  */
 @Singleton
-@Component(modules = {FakeUserManagerModule.class, FakePresenterModule.class})
+@Component(modules = {FakeUserManagerModule.class, FakePresenterModule.class, FakeUtilModule.class})
 public interface FakeActivityComponent extends ActivityComponent {
     void inject(LoginFragment fragment);
     void inject(ProfileActivity activity);

@@ -29,6 +29,8 @@
     <string name="error_item_not_changed">Changes were not saved</string>
     <string name="error_item_deleted">This item doesn\'t exist</string>
 
+    <string name="no_permissions">No permissions</string>
+
     <string name="login_welcome">Create shopping lists and share it with you friends</string>
     <string name="login_facebook">Sign in with Facebook</string>
     <string name="login_login_in_progress">Loading in&#8239;</string>
@@ -72,4 +74,18 @@
     <string name="users_error_remove_owner">Cannot remove owner</string>
     <string name="users_remove_title">Do you want to remove %s from list?</string>
     <string name="users_removing_user">Removing user</string>
+
+    <string name="shop_create_name_hint">Item name</string>
+    <string name="shop_create_name_error">Provide item name</string>
+    <string name="shop_create_quantity_hint">Quantity</string>
+    <string name="shop_create_quantity_error">Provide quantity</string>
+    <string-array name="shop_create_quantity_type">
+        <item>pieces</item>
+        <item>grams</item>
+        <item>kilograms</item>
+        <item>milliliters</item>
+        <item>liters</item>
+    </string-array>
+    <string name="shop_create_save">Save</string>
+    <string name="shop_create_image_error">Something went wrong</string>
 </resources>
