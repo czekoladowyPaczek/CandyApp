@@ -30,6 +30,7 @@ import com.candy.android.candyapp.helper.UiHelper;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.shop.holder.ShopViewHolder;
 import com.candy.android.candyapp.ui.ShopAdapter;
+import com.candy.android.zlog.ZLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,6 +129,7 @@ public class ShopListFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        ZLog.e("onDestroyView");
         adapter = null;
         shopList = null;
         root = null;

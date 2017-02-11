@@ -105,6 +105,7 @@ public class ShopListPresenter {
 
     public void cancelShopCreating() {
         if (shopCreateObservable != null && !shopCreateSubscription.isUnsubscribed()) {
+            shopCreateSubscription.unsubscribe();
             shopCreateSubscription = null;
             shopCreateObservable = null;
         }
