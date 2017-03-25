@@ -23,7 +23,7 @@ import com.candy.android.candyapp.testUtils.DummyActivity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlertDialog;
@@ -44,7 +44,7 @@ import static org.robolectric.Shadows.shadowOf;
 /**
  * @author Marcin
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class ShopDetailFragmentTest {
     private static final String ID = "123";

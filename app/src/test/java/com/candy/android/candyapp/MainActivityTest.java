@@ -7,7 +7,7 @@ import com.candy.android.candyapp.profile.ProfileActivity;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.fakes.RoboMenuItem;
 import org.robolectric.shadows.ShadowActivity;
@@ -19,7 +19,7 @@ import static org.robolectric.Shadows.shadowOf;
 /**
  * @author Marcin
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class MainActivityTest {
 

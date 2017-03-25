@@ -4,7 +4,7 @@ import com.candy.android.candyapp.BuildConfig;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ import static junit.framework.Assert.assertEquals;
 /**
  * @author Marcin
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class ModelErrorTest {
     @Test
