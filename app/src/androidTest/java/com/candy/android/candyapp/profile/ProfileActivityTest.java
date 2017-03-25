@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.login.LoginPresenter;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.model.ModelFriend;
@@ -60,6 +61,7 @@ public class ProfileActivityTest {
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakeUserManagerModule(new FakeUserManagerModule(manager))
                 .fakePresenterModule(new FakePresenterModule(mock(LoginPresenter.class), presenter))
+                .utilModule(new UtilModule(activityRule.getActivity()))
                 .build();
 
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();

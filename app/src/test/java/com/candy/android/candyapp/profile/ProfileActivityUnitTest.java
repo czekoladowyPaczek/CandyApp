@@ -10,6 +10,7 @@ import com.candy.android.candyapp.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeManagerModule;
 import com.candy.android.candyapp.graph.FakePresenterModule;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.managers.UserManager;
 
@@ -37,7 +38,7 @@ import static org.robolectric.Shadows.shadowOf;
  */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class)
-public class ProfileActivityTest {
+public class ProfileActivityUnitTest {
 
     private ProfilePresenter presenter;
     private ActivityController<ProfileActivity> activityController;
@@ -49,6 +50,7 @@ public class ProfileActivityTest {
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakeManagerModule(new FakeManagerModule(mock(UserManager.class)))
                 .fakePresenterModule(new FakePresenterModule(presenter))
+                .utilModule(new UtilModule(activity))
                 .build();
         ((CandyApplication) RuntimeEnvironment.application).setActivityComponent(component);
         activityController = Robolectric.buildActivity(ProfileActivity.class).create().start().resume().visible();

@@ -30,7 +30,6 @@ import com.candy.android.candyapp.helper.UiHelper;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.shop.holder.ShopViewHolder;
 import com.candy.android.candyapp.ui.ShopAdapter;
-import com.candy.android.zlog.ZLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +38,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import eu.boiled.android.zlog.ZLog;
 
 /**
  * Created by marcingawel on 02.06.2016.

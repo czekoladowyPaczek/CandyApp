@@ -3,7 +3,6 @@ package com.candy.android.candyapp.facebook;
 import android.content.Intent;
 
 import com.candy.android.candyapp.login.LoginFragment;
-import com.candy.android.zlog.ZLog;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -12,6 +11,7 @@ import com.facebook.login.LoginResult;
 
 import java.util.Arrays;
 
+import eu.boiled.android.zlog.ZLog;
 import rx.Observable;
 
 /**

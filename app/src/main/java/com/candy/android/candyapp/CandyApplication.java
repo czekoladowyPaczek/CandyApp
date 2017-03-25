@@ -6,12 +6,13 @@ import com.candy.android.candyapp.graph.component.ActivityComponent;
 import com.candy.android.candyapp.graph.component.DaggerActivityComponent;
 import com.candy.android.candyapp.graph.module.ApiModule;
 import com.candy.android.candyapp.graph.module.UtilModule;
-import com.candy.android.zlog.ZLog;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
+import eu.boiled.android.zlog.ZLog;
 import io.fabric.sdk.android.Fabric;
 
 /**

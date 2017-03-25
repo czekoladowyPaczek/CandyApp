@@ -33,7 +33,6 @@ import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
 import com.candy.android.candyapp.ui.UserAdapter;
-import com.candy.android.zlog.ZLog;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 
@@ -44,6 +43,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import eu.boiled.android.zlog.ZLog;
 
 /**
  * @author Marcin

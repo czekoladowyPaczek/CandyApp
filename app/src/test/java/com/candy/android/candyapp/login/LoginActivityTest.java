@@ -9,6 +9,7 @@ import com.candy.android.candyapp.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeManagerModule;
 import com.candy.android.candyapp.graph.FakePresenterModule;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.managers.UserManager;
 
 import org.junit.Before;
@@ -26,9 +27,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
-/**
- * Created by marcingawel on 29.05.2016.
- */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class)
 public class LoginActivityTest {
@@ -43,6 +41,7 @@ public class LoginActivityTest {
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakeManagerModule(new FakeManagerModule(userManager))
                 .fakePresenterModule(new FakePresenterModule(mock(LoginPresenter.class)))
+                .utilModule(new UtilModule(activity))
                 .build();
         ((CandyApplication) RuntimeEnvironment.application).setActivityComponent(component);
     }

@@ -13,6 +13,7 @@ import com.candy.android.candyapp.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeManagerModule;
 import com.candy.android.candyapp.graph.FakePresenterModule;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.model.ModelShopItem;
 import com.candy.android.candyapp.model.ModelShopItemTest;
@@ -57,6 +58,7 @@ public class ShopDetailFragmentTest {
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakePresenterModule(new FakePresenterModule(presenter))
                 .fakeManagerModule(new FakeManagerModule(mock(ShopManager.class)))
+                .utilModule(new UtilModule(RuntimeEnvironment.application))
                 .build();
         ((CandyApplication) RuntimeEnvironment.application).setActivityComponent(component);
 

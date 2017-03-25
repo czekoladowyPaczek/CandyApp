@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.shop;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.candy.android.candyapp.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeManagerModule;
 import com.candy.android.candyapp.graph.FakePresenterModule;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.managers.ShopManager;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopTest;
@@ -57,6 +59,7 @@ public class ShopListFragmentTest {
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakePresenterModule(new FakePresenterModule(presenter))
                 .fakeManagerModule(new FakeManagerModule(mock(ShopManager.class)))
+                .utilModule(new UtilModule(mock(Context.class)))
                 .build();
         ((CandyApplication) RuntimeEnvironment.application).setActivityComponent(component);
 

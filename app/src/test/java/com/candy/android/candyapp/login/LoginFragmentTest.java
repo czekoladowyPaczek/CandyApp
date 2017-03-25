@@ -1,6 +1,7 @@
 package com.candy.android.candyapp.login;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.widget.Button;
 
 import com.candy.android.candyapp.BuildConfig;
@@ -11,6 +12,7 @@ import com.candy.android.candyapp.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.graph.FakeActivityComponent;
 import com.candy.android.candyapp.graph.FakePresenterModule;
 import com.candy.android.candyapp.graph.FakeManagerModule;
+import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.managers.UserManager;
 
 import org.junit.Before;
@@ -56,6 +58,7 @@ public class LoginFragmentTest {
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakePresenterModule(new FakePresenterModule(presenter))
                 .fakeManagerModule(new FakeManagerModule(userManager))
+                .utilModule(new UtilModule(mock(Context.class)))
                 .build();
         ((CandyApplication) RuntimeEnvironment.application).setActivityComponent(component);
 
