@@ -9,6 +9,7 @@ import com.candy.android.candyapp.graph.component.ActivityComponent;
 public class MockCandyApplication extends CandyApplication {
     private ActivityComponent activityComponent;
 
+    @Override
     public void setActivityComponent(@NonNull ActivityComponent activityComponent) {
         this.activityComponent = activityComponent;
     }

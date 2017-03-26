@@ -1,6 +1,7 @@
 package com.candy.android.candyapp;
 
 import android.app.Application;
+import android.support.annotation.VisibleForTesting;
 
 import com.candy.android.candyapp.graph.component.ActivityComponent;
 import com.candy.android.candyapp.graph.component.DaggerActivityComponent;
@@ -57,5 +58,10 @@ public class CandyApplication extends Application {
                 .defaultDisplayImageOptions(opts)
                 .build();
         ImageLoader.getInstance().init(imgConfig);
+    }
+
+    @VisibleForTesting
+    public void setActivityComponent(ActivityComponent activityComponent) {
+        this.activityComponent = activityComponent;
     }
 }
