@@ -31,4 +31,9 @@ public class FakeUtilModule {
     PictureSelectHelper pictureSelectHelper() {
         return pictureSelectHelper;
     }
+
+    @Provides
+    PermissionsHelper permissionsHelper() {
+        return permissionsHelper;
+    }
 }

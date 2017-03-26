@@ -10,6 +10,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.candy.android.candyapp.login.LoginActivity;
 import com.candy.android.candyapp.managers.UserManager;
+import com.candy.android.candyapp.testUtils.MockCandyApplication;
 import com.candy.android.candyapp.testUtils.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.testUtils.graph.FakeActivityComponent;
 import com.candy.android.candyapp.testUtils.graph.FakePresenterModule;
@@ -46,7 +47,7 @@ public class LoginActivityTest {
                 .build();
 
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        CandyApplication app = (CandyApplication) instrumentation.getTargetContext().getApplicationContext();
+        MockCandyApplication app = (MockCandyApplication) instrumentation.getTargetContext().getApplicationContext();
         app.setActivityComponent(component);
 
         activityRule.launchActivity(new Intent());

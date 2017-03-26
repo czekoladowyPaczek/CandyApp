@@ -12,7 +12,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.candy.android.candyapp.testUtils.CandyJunitRunner"
     }
     buildTypes {
         release {
@@ -34,14 +34,6 @@ android {
     lintOptions {
         lintConfig rootProject.file('gradle/lint.xml')
     }
-
-    testOptions {
-        unitTests {
-            all {
-                jvmArgs '-noverify'
-            }
-        }
-    }
 }
 
 dependencies {
@@ -60,7 +52,7 @@ dependencies {
     compile 'com.squareup.retrofit2:converter-gson:2.0.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.2.0'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
-    compile 'eu.boiled.zlog:zlog:1.5'
+    compile 'eu.boiled.zlog:zlog:1.6'
 
     testApt 'com.google.dagger:dagger-compiler:2.2'
     testCompile 'junit:junit:4.12'

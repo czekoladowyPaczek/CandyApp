@@ -11,7 +11,6 @@ import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.suitebuilder.annotation.LargeTest;
 
-import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.graph.component.ActivityComponent;
@@ -20,6 +19,7 @@ import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopUser;
 import com.candy.android.candyapp.model.ModelUser;
+import com.candy.android.candyapp.testUtils.MockCandyApplication;
 import com.candy.android.candyapp.testUtils.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.testUtils.graph.FakePresenterModule;
 import com.candy.android.candyapp.testUtils.graph.FakeUserManagerModule;
@@ -102,7 +102,7 @@ public class ShopFriendActivityTest {
                 .fakeUserManagerModule(new FakeUserManagerModule(Mockito.mock(UserManager.class)))
                 .build();
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        ((CandyApplication) instrumentation.getTargetContext().getApplicationContext()).setActivityComponent(component);
+        ((MockCandyApplication) instrumentation.getTargetContext().getApplicationContext()).setActivityComponent(component);
     }
 
     @After

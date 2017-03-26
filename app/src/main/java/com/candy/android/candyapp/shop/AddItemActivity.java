@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -22,6 +20,7 @@ import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.managers.ImageUploadManager;
 import com.candy.android.candyapp.model.UploadedImage;
+import com.candy.android.candyapp.util.PermissionsHelper;
 import com.candy.android.candyapp.util.PictureSelectHelper;
 
 import java.io.IOException;
@@ -61,6 +60,8 @@ public class AddItemActivity extends AppCompatActivity {
     PictureSelectHelper pictureHelper;
     @Inject
     ImageUploadManager uploadManager;
+    @Inject
+    PermissionsHelper permissionsHelper;
 
     private String localPath;
     private Observable<UploadedImage> imageObservable;
@@ -79,9 +80,10 @@ public class AddItemActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         image.setOnClickListener((v) -> {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, PERMISSION_REQUEST_CODE);
+            if (!permissionsHelper.hasPermissions(this, Manifest.permission.CAMERA) ||
+                    !permissionsHelper.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                permissionsHelper.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+                        PERMISSION_REQUEST_CODE);
                 return;
             }
             try {

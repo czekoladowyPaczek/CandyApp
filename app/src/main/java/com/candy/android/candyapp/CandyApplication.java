@@ -15,35 +15,16 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import eu.boiled.android.zlog.ZLog;
 import io.fabric.sdk.android.Fabric;
 
-/**
- * @author Marcin
- */
-
 public class CandyApplication extends Application {
-
     private static CandyApplication app;
     private ActivityComponent activityComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
-        ZLog.init(BuildConfig.DEBUG);
-        FacebookSdk.sdkInitialize(this);
 
-        DisplayImageOptions opts = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .build();
-        ImageLoaderConfiguration imgConfig = new ImageLoaderConfiguration.Builder(this)
-                .defaultDisplayImageOptions(opts)
-                .build();
-        ImageLoader.getInstance().init(imgConfig);
-
-        activityComponent = DaggerActivityComponent.builder()
-                .apiModule(new ApiModule(this))
-                .utilModule(new UtilModule(this))
-                .build();
+        init();
+        activityComponent = createActivityComponent();
 
         app = this;
     }
@@ -56,7 +37,25 @@ public class CandyApplication extends Application {
         return activityComponent;
     }
 
-    public void setActivityComponent(ActivityComponent activityComponent) {
-        this.activityComponent = activityComponent;
+    private ActivityComponent createActivityComponent() {
+        return DaggerActivityComponent.builder()
+                .apiModule(new ApiModule(this))
+                .utilModule(new UtilModule(this))
+                .build();
+    }
+
+    protected void init() {
+        Fabric.with(this, new Crashlytics());
+        ZLog.init(BuildConfig.DEBUG);
+        FacebookSdk.sdkInitialize(this);
+
+        DisplayImageOptions opts = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .build();
+        ImageLoaderConfiguration imgConfig = new ImageLoaderConfiguration.Builder(this)
+                .defaultDisplayImageOptions(opts)
+                .build();
+        ImageLoader.getInstance().init(imgConfig);
     }
 }

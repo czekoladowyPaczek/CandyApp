@@ -7,17 +7,17 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.candy.android.candyapp.CandyApplication;
 import com.candy.android.candyapp.R;
-import com.candy.android.candyapp.graph.module.UtilModule;
 import com.candy.android.candyapp.login.LoginPresenter;
 import com.candy.android.candyapp.managers.UserManager;
 import com.candy.android.candyapp.model.ModelFriend;
 import com.candy.android.candyapp.model.ModelUser;
+import com.candy.android.candyapp.testUtils.MockCandyApplication;
 import com.candy.android.candyapp.testUtils.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.testUtils.graph.FakeActivityComponent;
 import com.candy.android.candyapp.testUtils.graph.FakePresenterModule;
 import com.candy.android.candyapp.testUtils.graph.FakeUserManagerModule;
+import com.candy.android.candyapp.testUtils.graph.FakeUtilModule;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -61,11 +61,11 @@ public class ProfileActivityTest {
         FakeActivityComponent component = DaggerFakeActivityComponent.builder()
                 .fakeUserManagerModule(new FakeUserManagerModule(manager))
                 .fakePresenterModule(new FakePresenterModule(mock(LoginPresenter.class), presenter))
-                .utilModule(new UtilModule(activityRule.getActivity()))
+                .fakeUtilModule(new FakeUtilModule())
                 .build();
 
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        CandyApplication app = (CandyApplication) instrumentation.getTargetContext().getApplicationContext();
+        MockCandyApplication app = (MockCandyApplication) instrumentation.getTargetContext().getApplicationContext();
         app.setActivityComponent(component);
     }
 

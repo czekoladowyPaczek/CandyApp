@@ -17,6 +17,7 @@ import com.candy.android.candyapp.model.ModelShopItem;
 import com.candy.android.candyapp.model.ModelShopUser;
 import com.candy.android.candyapp.shop.ShopDetailPresenter;
 import com.candy.android.candyapp.shop.ShopListPresenter;
+import com.candy.android.candyapp.testUtils.MockCandyApplication;
 import com.candy.android.candyapp.testUtils.graph.DaggerFakeActivityComponent;
 import com.candy.android.candyapp.testUtils.graph.FakePresenterModule;
 
@@ -50,7 +51,7 @@ import static org.mockito.Mockito.when;
  */
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class MainActivityTest {
+public class MainActivityInstrumentationTest {
 
     private ShopManager manager;
     private ModelShop shop;
@@ -77,7 +78,7 @@ public class MainActivityTest {
                 .build();
 
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-        CandyApplication app = (CandyApplication) instrumentation.getTargetContext().getApplicationContext();
+        MockCandyApplication app = (MockCandyApplication) instrumentation.getTargetContext().getApplicationContext();
         app.setActivityComponent(component);
         activityTestRule.launchActivity(new Intent());
     }

@@ -27,4 +27,4 @@ env:
 
 script:
   - android list target
-  - ./gradlew connectedAndroidTest -PdisablePreDex
+  - ./gradlew check connectedCheck -PdisablePreDex
