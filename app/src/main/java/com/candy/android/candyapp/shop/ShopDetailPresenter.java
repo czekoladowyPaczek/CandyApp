@@ -1,9 +1,12 @@
 package com.candy.android.candyapp.shop;
 
+import android.support.annotation.StringRes;
+
 import com.candy.android.candyapp.R;
 import com.candy.android.candyapp.api.ModelError;
 import com.candy.android.candyapp.api.ModelResponseSimple;
 import com.candy.android.candyapp.managers.ShopManager;
+import com.candy.android.candyapp.model.ModelShop;
 import com.candy.android.candyapp.model.ModelShopItem;
 
 import java.util.List;
@@ -18,10 +21,11 @@ import rx.schedulers.Schedulers;
  */
 
 public class ShopDetailPresenter {
-    private boolean freshStart = true;
     private ShopManager shopManager;
-    private String listId;
-    private ShopDetailFragment fragment;
+
+    private ShopDetailFragmentContract fragment;
+    private ModelShop shop;
+    private List<ModelShopItem> items;
 
     private Observable<List<ModelShopItem>> getItemsObs;
     private Subscription getItemsSub;
@@ -33,24 +37,24 @@ public class ShopDetailPresenter {
         this.shopManager = shopManager;
     }
 
-    public void setParent(String listId, ShopDetailFragment fragment) {
-        this.listId = listId;
+    public void setParent(ShopDetailFragmentContract fragment) {
         this.fragment = fragment;
 
-        if (freshStart || getItemsObs != null) {
-            freshStart = false;
-            fragment.showListLoading(true);
+        if (shop == null) {
+            shop = fragment.getShopList();
+            fragment.showListLoading();
+            getShopListItems(true);
+        } else if (getItemsObs != null) {
+            fragment.showListLoading();
+            getItemsSub = subscribeToGetItems(getItemsObs);
+        } else if (items != null) {
+            fragment.setShopItems(items);
         }
 
-        if (getItemsObs != null) {
-            getItemsSub = subscribeToGetItems(getItemsObs);
-        } else {
-            getShopListItems(true);
-        }
-        if (removeListObs != null) {
-            fragment.showRemovingDialog();
-            removeListSub = subscribeToRemoveList(removeListObs);
-        }
+//        if (removeListObs != null) {
+//            fragment.showRemovingDialog();
+//            removeListSub = subscribeToRemoveList(removeListObs);
+//        }
     }
 
     public void removeParent() {
@@ -64,7 +68,7 @@ public class ShopDetailPresenter {
     }
 
     public void getShopListItems(boolean cache) {
-        getItemsObs = shopManager.getShopItems(listId, cache)
+        getItemsObs = shopManager.getShopItems(shop.getId(), cache)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .cache();
@@ -72,36 +76,37 @@ public class ShopDetailPresenter {
     }
 
     public void deleteList() {
-        removeListObs = shopManager.removeShopList(listId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .cache();
-        removeListSub = subscribeToRemoveList(removeListObs);
+//        removeListObs = shopManager.removeShopList(listId)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .cache();
+//        removeListSub = subscribeToRemoveList(removeListObs);
     }
 
     private Subscription subscribeToGetItems(Observable<List<ModelShopItem>> obs) {
         return obs.subscribe(items -> {
-            fragment.showListLoading(false);
-            fragment.setData(items);
+            this.items = items;
+            fragment.setShopItems(this.items);
+            fragment.hideListLoading();
             getItemsObs = null;
         }, err -> {
-            fragment.showListLoading(false);
+            fragment.hideListLoading();
             showError(err);
             getItemsObs = null;
         });
     }
 
-    private Subscription subscribeToRemoveList(Observable<ModelResponseSimple> obs) {
-        return obs.subscribe(response -> {
-            fragment.hideRemovingDialog();
-            fragment.onListDeleted();
-            removeListObs = null;
-        }, error -> {
-            fragment.hideRemovingDialog();
-            showError(error);
-            removeListObs = null;
-        });
-    }
+//    private Subscription subscribeToRemoveList(Observable<ModelResponseSimple> obs) {
+//        return obs.subscribe(response -> {
+//            fragment.hideRemovingDialog();
+//            fragment.onListDeleted();
+//            removeListObs = null;
+//        }, error -> {
+//            fragment.hideRemovingDialog();
+//            showError(error);
+//            removeListObs = null;
+//        });
+//    }
 
     private void showError(Throwable error) {
         switch (ModelError.fromRetrofit(error)) {
@@ -117,5 +122,15 @@ public class ShopDetailPresenter {
             default:
                 fragment.showError(R.string.error_unknown);
         }
+    }
+
+    public interface ShopDetailFragmentContract {
+        ModelShop getShopList();
+        void showError(@StringRes int res);
+        void showListLoading();
+        void hideListLoading();
+        void setShopItems(List<ModelShopItem> items);
+        void showRemovingDialog();
+        void hideRemovingDialog();
     }
 }

@@ -36,11 +36,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Created by marcingawel on 05.06.2016.
- */
-
-public class ShopDetailFragment extends Fragment {
+public class ShopDetailFragment extends Fragment implements ShopDetailPresenter.ShopDetailFragmentContract {
     public interface OnListDeletedCallback {
         void onListDeleted();
     }
@@ -114,7 +110,7 @@ public class ShopDetailFragment extends Fragment {
 
         createShopButton.setOnClickListener(v -> startActivity(new Intent(getContext(), AddItemActivity.class)));
 
-        presenter.setParent(shop.getId(), this);
+        presenter.setParent(this);
     }
 
     @Override
@@ -156,11 +152,18 @@ public class ShopDetailFragment extends Fragment {
         inflater.inflate(R.menu.shop_detail_menu, menu);
     }
 
+    @Override
+    public ModelShop getShopList() {
+        return getArguments().getParcelable(LIST_ID);
+    }
+
+    @Override
     public void showRemovingDialog() {
         removingDialog = ProgressDialog.show(getContext(), null, getString(R.string.detail_deleting_list), true, false);
         removingDialog.show();
     }
 
+    @Override
     public void hideRemovingDialog() {
         if (removingDialog != null) {
             try {
@@ -173,7 +176,8 @@ public class ShopDetailFragment extends Fragment {
         }
     }
 
-    public void setData(List<ModelShopItem> items) {
+    @Override
+    public void setShopItems(List<ModelShopItem> items) {
         int count = this.items.size();
         this.items.clear();
         adapter.notifyItemRangeRemoved(0, count);
@@ -186,10 +190,21 @@ public class ShopDetailFragment extends Fragment {
         }
     }
 
-    public void showListLoading(boolean refreshing) {
-        refreshLayout.post(() -> refreshLayout.setRefreshing(refreshing));
+    @Override
+    public void showListLoading() {
+        setListRefreshing(true);
     }
 
+    @Override
+    public void hideListLoading() {
+        setListRefreshing(false);
+    }
+
+    private void setListRefreshing(boolean isRefreshing) {
+        refreshLayout.post(() -> refreshLayout.setRefreshing(isRefreshing));
+    }
+
+    @Override
     public void showError(@StringRes int res) {
         Snackbar.make(root, res, Snackbar.LENGTH_LONG).show();
     }
